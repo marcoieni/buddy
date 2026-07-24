@@ -43,6 +43,7 @@ So place there all the projects you want to work on with codex.
   ```sh
   just create
   ```
+
 - Make sure you can access the 1Password `Infrastructure` vault in the Rust-Foundation
   1password. It contains credentials for `datadog`. If you are experiencing issues,
   check the [authentication docs](./docs/authentication.md).
@@ -52,6 +53,7 @@ So place there all the projects you want to work on with codex.
   ```sh
   just login
   ```
+
 - Start the VM:
 
   ```sh
@@ -77,11 +79,11 @@ and use codex remotely.
     Include ~/.lima/*/ssh.config
     ```
 
- - Test the SSH connection to the VM:
+- Test the SSH connection to the VM:
 
-  ```sh
-  ssh lima-buddy
-  ```
+```sh
+ssh lima-buddy
+```
 
 - Configure the connection in ChatGPT desktop:
 
@@ -110,16 +112,16 @@ for more details.
 
 ## Security
 
-* Read-only cloud tokens are still secrets and can be copied or abused. This
+- Read-only cloud tokens are still secrets and can be copied or abused. This
   is why we should use tokens with an expiration date.
-  * Rotate tokens before they expire, and revoke a token immediately if the VM
+  - Rotate tokens before they expire, and revoke a token immediately if the VM
     or token might have been compromised.
 
 ## FAQ
 
 > Why not running Codex directly on the host?
 
-* Auditing all commands that codex wants to run is not productive. Instead, by running in a VM without any privileges, you can run codex in yolo mode.
+- Auditing all commands that codex wants to run is not productive. Instead, by running in a VM without any privileges, you can run codex in yolo mode.
 
 > Why not using one VM per project?
 
@@ -130,12 +132,13 @@ Each VM has its own guest operating system, installed tools, package caches, and
 > Why lima instead of docker desktop?
 
 Lima provides:
-* A full Ubuntu VM rather than an Ubuntu container.
-* A first-class SSH endpoint and generated OpenSSH configuration.
-* It's an open source [CNCF project](https://www.cncf.io/projects/lima/), while Docker Desktop is a proprietary product.
-* The Docker Desktop feature [Enhanced Container Isolation](https://docs.docker.com/enterprise/security/hardened-desktop/enhanced-container-isolation/), which "prevents malicious containers from compromising the host system" is restricted to Docker Business.
+
+- A full Ubuntu VM rather than an Ubuntu container.
+- A first-class SSH endpoint and generated OpenSSH configuration.
+- It's an open source [CNCF project](https://www.cncf.io/projects/lima/), while Docker Desktop is a proprietary product.
+- The Docker Desktop feature [Enhanced Container Isolation](https://docs.docker.com/enterprise/security/hardened-desktop/enhanced-container-isolation/), which "prevents malicious containers from compromising the host system" is restricted to Docker Business.
 
 > I don't want to run codex with full privileges, I think it is dangerous!
 
 Nobody forces you to run codex with full privileges. You can still run it in a VM for improved security
-*and* customize its permissions.
+_and_ customize its permissions.

@@ -6,7 +6,7 @@ minimumLimaVersion: 2.1.2
 # template:ubuntu-26.04 here: those templates also inherit Lima's default
 # home-directory mount. And we don't want AI to access our home directory.
 base:
-- template:_images/ubuntu-26.04
+  - template:_images/ubuntu-26.04
 
 # Do not copy the host's proxy environment into the VM: proxy URLs can
 # contain credentials, and this VM must not inherit host secrets.
