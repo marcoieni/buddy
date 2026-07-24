@@ -112,3 +112,8 @@ Lima provides:
 * A first-class SSH endpoint and generated OpenSSH configuration.
 * It's an open source [CNCF project](https://www.cncf.io/projects/lima/), while Docker Desktop is a proprietary product.
 * The Docker Desktop feature [Enhanced Container Isolation](https://docs.docker.com/enterprise/security/hardened-desktop/enhanced-container-isolation/), which "prevents malicious containers from compromising the host system" is restricted to Docker Business.
+
+> I don't want to run codex with full privileges, I think it is dangerous!
+
+Nobody forces you to run codex with full privileges. You can still run it in a VM for improved security
+*and* customize its permissions.
