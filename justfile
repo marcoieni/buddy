@@ -34,7 +34,7 @@ login-fastly:
 # a full upgrade would make startup slower, less predictable, and could install kernel updates requiring another reboot.
 upgrade:
     limactl shell "{{ vm }}" sudo apt-get upgrade
-    limactl shell "{{ vm }}" brew update && brew upgrade --yes
+    limactl shell "{{ vm }}" bash -lc 'brew update && brew upgrade --yes'
 
 rebuild: delete create
 
