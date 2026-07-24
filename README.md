@@ -21,12 +21,33 @@ So place there all the projects you want to work on with codex.
   ```sh
   brew install lima just
   ```
+
+- Set up one password:
+  1. Check if you have the 1Password CLI installed:
+
+     ```sh
+     op --version
+     ```
+
+  2. If not, install it with Homebrew:
+
+     ```sh
+     brew install 1password-cli
+     ```
+
+  3. If you have the 1password desktop app installed, enable:
+     **Settings > Developer > Integrate with 1password CLI**.
+
 - Create the VM:
 
   ```sh
   just create
   ```
-- Login to Codex, DataDog and Fastly from the guest
+- Make sure you can access the 1Password `Infrastructure` vault in the Rust-Foundation
+  1password. It contains credentials for `datadog`. If you are experiencing issues,
+  check the [authentication docs](./docs/authentication.md).
+
+- Login to Codex, Datadog and Fastly from the guest:
 
   ```sh
   just login
@@ -89,9 +110,10 @@ for more details.
 
 ## Security
 
-* Read-only cloud tokens are still secrets and can be copied or abused.
-  It's better to login without tokens, e.g. using device auth, and to avoid copying any secrets into the VM.
-  * It is recommended to periodically rotate any tokens that are used in the VM.
+* Read-only cloud tokens are still secrets and can be copied or abused. This
+  is why we should use tokens with an expiration date.
+  * Rotate tokens before they expire, and revoke a token immediately if the VM
+    or token might have been compromised.
 
 ## FAQ
 
