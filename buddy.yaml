@@ -1,0 +1,45 @@
+# Docs: https://lima-vm.io/docs/config/
+
+minimumLimaVersion: 2.1.2
+
+# Use only the Ubuntu image definition. Do not inherit template:default or
+# template:ubuntu-26.04 here: those templates also inherit Lima's default
+# home-directory mount. And we don't want AI to access our home directory.
+base:
+- template:_images/ubuntu-26.04
+
+# Do not copy the host's proxy environment into the VM: proxy URLs can
+# contain credentials, and this VM must not inherit host secrets.
+propagateProxyEnv: false
+
+ssh:
+  forwardAgent: false
+  loadDotSSHPubKeys: false
+
+cpus: 8
+memory: "10GiB"
+# VM's virtual capacity. 100 GiB aren't allocated immediately:
+# Lima uses a sparse disk that consumes host space as data is written.
+disk: "100GiB"
+
+# Directories of the host exposed to the guest.
+mounts:
+  - location: "~/buddy"
+    mountPoint: "/work"
+    writable: true
+
+# Lima enables rootless containerd by default. This VM does not use containers,
+# so keep both system (rootful) and user (rootless) modes off to avoid installing and running an unused runtime.
+containerd:
+  system: false
+  user: false
+
+# Provisioning scripts need to be idempotent because they might be called
+# multiple times, e.g. when the host VM is being restarted.
+# The scripts can use the following template variables: {{.Home}}, {{.Name}}, {{.Hostname}}, {{.UID}}, {{.User}}, and {{.Param.Key}}.
+provision:
+  - mode: system # execute as root
+    file: ./provision/system.sh
+
+  - mode: user # execute as the user
+    file: ./provision/user.sh
