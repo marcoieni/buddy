@@ -22,10 +22,13 @@ stop:
 delete: stop
     limactl delete --force "{{ vm }}"
 
-login: login-codex login-fastly
+login: login-codex login-datadog login-fastly
 
 login-codex:
     limactl shell "{{ vm }}" bash -lc 'codex login --device-auth'
+
+login-datadog:
+    scripts/login-datadog.sh "{{ vm }}"
 
 login-fastly:
     limactl shell "{{ vm }}" bash -lc 'fastly auth login'
@@ -40,7 +43,7 @@ rebuild: delete create
 
 validate:
     limactl template validate buddy.yaml
-    shellcheck provision/*.sh
+    shellcheck provision/*.sh scripts/*.sh
 
 shell:
     limactl shell "{{ vm }}"
