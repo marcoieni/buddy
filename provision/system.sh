@@ -22,9 +22,3 @@ apt-get install -y \
 
 # Since we are using snap, the aws-cli will be automatically updated.
 snap install aws-cli --classic
-
-# Install homebrew
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-brew install datadog-labs/pack/pup
-brew install fastly/tap/fastly
