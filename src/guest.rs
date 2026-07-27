@@ -5,19 +5,6 @@ use std::{
 
 use anyhow::{Context, bail};
 
-pub(crate) fn run(vm: &str, script: &str) -> anyhow::Result<()> {
-    let status = Command::new("limactl")
-        .args(["shell", vm, "bash", "-lc", script])
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .status()
-        .context("failed to run limactl")?;
-    if !status.success() {
-        bail!("limactl exited with {status}");
-    }
-    Ok(())
-}
-
 pub(crate) fn capture(vm: &str, script: &str) -> anyhow::Result<String> {
     let output = Command::new("limactl")
         .args(["shell", vm, "bash", "-lc", script])

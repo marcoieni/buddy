@@ -22,7 +22,7 @@ pub(crate) fn login(vm: &str) -> anyhow::Result<()> {
         ],
     )?;
 
-    guest::run(vm, "fastly service list --per-page 1")?;
+    guest::capture(vm, "fastly service list --per-page 1")?;
     println!("Fastly authentication is configured and working.");
     Ok(())
 }
