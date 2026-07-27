@@ -82,10 +82,7 @@ pub(crate) fn dump_permissions(vm: &str) -> anyhow::Result<()> {
     assert_current_token(vm)?;
     let live_snapshot = live_permissions(vm)?;
     snapshot::write(path, live_snapshot.as_bytes())?;
-    println!(
-        "Wrote the current Datadog permissions to {}",
-        path.display()
-    );
+    println!("Wrote the current Datadog permissions to {path:?}");
     Ok(())
 }
 
@@ -95,8 +92,7 @@ pub(crate) fn assert_permissions(vm: &str) -> anyhow::Result<()> {
 
     let expected = fs::read_to_string(path).with_context(|| {
         format!(
-            "Datadog permissions snapshot not found: {}\nCreate it with: just dump-datadog-permissions",
-            path.display()
+            "Datadog permissions snapshot not found: {path:?}\nCreate it with: just dump-datadog-permissions"
         )
     })?;
 
@@ -105,7 +101,7 @@ pub(crate) fn assert_permissions(vm: &str) -> anyhow::Result<()> {
     if expected != live {
         let diff = TextDiff::from_lines(&expected, &live)
             .unified_diff()
-            .header(&path.display().to_string(), "live Datadog permissions")
+            .header(&format!("{path:?}"), "live Datadog permissions")
             .to_string();
         print!("{diff}");
         io::stdout()
@@ -117,10 +113,7 @@ pub(crate) fn assert_permissions(vm: &str) -> anyhow::Result<()> {
         );
     }
 
-    println!(
-        "Datadog credentials are current and their permissions match {}",
-        path.display()
-    );
+    println!("Datadog credentials are current and their permissions match {path:?}");
     Ok(())
 }
 

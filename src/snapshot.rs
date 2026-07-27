@@ -9,7 +9,7 @@ pub(crate) fn write(path: &Path, contents: &[u8]) -> anyhow::Result<()> {
         .filter(|path| !path.as_os_str().is_empty())
         .unwrap_or_else(|| Path::new("."));
     fs::create_dir_all(parent)
-        .with_context(|| format!("failed to create snapshot directory {}", parent.display()))?;
+        .with_context(|| format!("failed to create snapshot directory {parent:?}"))?;
 
     let prefix = path
         .file_name()
@@ -19,7 +19,7 @@ pub(crate) fn write(path: &Path, contents: &[u8]) -> anyhow::Result<()> {
     let mut temporary = Builder::new()
         .prefix(&prefix)
         .tempfile_in(parent)
-        .with_context(|| format!("failed to create a temporary file in {}", parent.display()))?;
+        .with_context(|| format!("failed to create a temporary file in {parent:?}"))?;
 
     temporary
         .write_all(contents)
@@ -31,6 +31,6 @@ pub(crate) fn write(path: &Path, contents: &[u8]) -> anyhow::Result<()> {
     temporary
         .persist(path)
         .map_err(|error| error.error)
-        .with_context(|| format!("failed to replace permissions snapshot {}", path.display()))?;
+        .with_context(|| format!("failed to replace permissions snapshot {path:?}"))?;
     Ok(())
 }
