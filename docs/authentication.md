@@ -61,6 +61,13 @@ This exports the token through the Fastly CLI's supported
 `FASTLY_DISABLE_AUTH_COMMAND=1` because Fastly authentication is managed
 externally by Buddy rather than by a stored CLI profile.
 
+### Permissions
+
+Fastly `global:read` can't read Fastly Secret Store values.
+
+However, it can read various things, such as VCL snippets,
+so only store secrets in the Secret Store.
+
 ### Replace an expired Fastly token
 
 Do not create a token during normal setup because the token already exists.
