@@ -45,8 +45,9 @@ So place there all the projects you want to work on with codex.
   ```
 
 - Make sure you can access the 1Password `Infrastructure` vault in the Rust-Foundation
-  1password. It contains credentials for `datadog`. If you are experiencing issues,
-  check the [authentication docs](./docs/authentication.md).
+  1Password. It contains the read-only credentials for Datadog and Fastly. If
+  you are experiencing issues, check the
+  [authentication docs](./docs/authentication.md).
 
 - Login to Codex, Datadog and Fastly from the guest:
 

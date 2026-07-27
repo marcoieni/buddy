@@ -38,3 +38,47 @@ Create a new token from scratch only when the old one has expired:
    token, which begins with `ddsat_`.
 8. Run `just login-datadog`. This copies the replacement into the VM and verifies
    it with a read-only Datadog request.
+
+## Fastly authentication
+
+Buddy uses a [Fastly automation token](https://www.fastly.com/documentation/guides/account-info/user-and-account-management/using-api-tokens/)
+for this non-interactive use case. Unlike a user token, an automation token is
+not tied to an employee's account lifecycle. The token has the `global:read`
+scope, is limited to only the required services when practical, and has an
+expiration date.
+
+The shared token is stored in the Rust Foundation 1Password `Infrastructure`
+vault as an item named `fastly-read-only`, in a field named `credential`.
+Buddy reads it using the fixed secret reference
+`op://Infrastructure/fastly-read-only/credential`.
+
+Sign in to the 1Password CLI on the host, then configure and verify the guest:
+
+```sh
+just login-fastly
+```
+
+This exports the token through the Fastly CLI's supported
+`FASTLY_API_TOKEN` environment variable. It also sets
+`FASTLY_DISABLE_AUTH_COMMAND=1` because Fastly authentication is managed
+externally by Buddy rather than by a stored CLI profile.
+
+### Replace an expired Fastly token
+
+Do not create a token during normal setup because the token already exists.
+Create a new token from scratch only when the old one has expired:
+
+1. Open [Fastly Account > API tokens](https://manage.fastly.com/account/personal/tokens)
+   as a superuser and switch to sudo mode.
+2. Open **Account tokens**. If an automation token named `buddy` exists,
+   revoke it.
+3. Select **Create token**, name it `buddy`, and choose **Automation token**.
+4. Choose the least-privileged role that provides the required visibility,
+   disable TLS management, and select the `global:read` scope.
+5. Limit access to the services Buddy needs when practical and choose an
+   expiration date.
+6. Create and immediately copy the token. Fastly shows the secret only once.
+7. Replace `credential` in the 1Password `fastly-read-only` item with the new
+   token.
+8. Run `just login-fastly`. This copies the replacement into the VM and
+   verifies it with a read-only Fastly request.
