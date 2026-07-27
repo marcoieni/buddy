@@ -18,6 +18,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v7.0.1
 
+      - name: Check formatting
+        run: npx --yes prettier@3.9.6 --check .
+
       - name: Set up just
         uses: extractions/setup-just@v4.0.0
 
