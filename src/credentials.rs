@@ -21,7 +21,7 @@ pub(crate) fn read_secret(reference: &str) -> anyhow::Result<String> {
     }
 
     let output = String::from_utf8(output.stdout).context("op returned non-UTF-8 output")?;
-    Ok(output.trim_end_matches(['\r', '\n']).to_owned())
+    Ok(output.trim().to_owned())
 }
 
 fn install_guest(vm: &str, credentials_name: &str, credentials: &[u8]) -> anyhow::Result<()> {
