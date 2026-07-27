@@ -30,6 +30,12 @@ login-codex:
 login-datadog:
     scripts/login-datadog.sh "{{ vm }}"
 
+dump-datadog-permissions:
+    scripts/datadog-permissions.sh dump "{{ vm }}" docs/datadog-permissions.json
+
+assert-datadog-credentials:
+    scripts/datadog-permissions.sh assert "{{ vm }}" docs/datadog-permissions.json
+
 login-fastly:
     scripts/login-fastly.sh "{{ vm }}"
 
