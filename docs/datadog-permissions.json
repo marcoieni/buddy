@@ -1,0 +1,58 @@
+{
+  "permissions": [
+    {
+      "id": "1af86ce4-7823-11ea-93dc-d7cad1b1c6cb",
+      "name": "logs_read_data",
+      "display_name": "Logs Read Data",
+      "description": "Read log data. In order to read log data, a user must have both this permission and Logs Read Index Data. This permission can be restricted with restriction queries. Restrictions are limited to the Log Management product.",
+      "group_name": "Log Management",
+      "name_aliases": [],
+      "restricted": false
+    },
+    {
+      "id": "417ba636-2dce-11eb-84c0-6bce5b0d9de0",
+      "name": "apm_read",
+      "display_name": "APM Read",
+      "description": "Read and query APM and Trace Analytics.",
+      "group_name": "APM",
+      "name_aliases": [],
+      "restricted": true
+    },
+    {
+      "id": "4441648c-d8b1-11e9-a77a-1b899a04b304",
+      "name": "monitors_read",
+      "display_name": "Monitors Read",
+      "description": "View monitors.",
+      "group_name": "Monitors",
+      "name_aliases": [],
+      "restricted": true
+    },
+    {
+      "id": "5e605652-dd12-11e8-9e53-375565b8970e",
+      "name": "logs_read_index_data",
+      "display_name": "Logs Read Index Data",
+      "description": "Read log data, possibly scoped to one or more indexes. In order to read log data, a user must have both this permission and Logs Read Data. This permission can be granted in a limited capacity per index from the Logs interface or APIs. If granted via the Roles interface or API the permission has global scope. Restrictions are limited to the Log Management product.",
+      "group_name": "Log Management",
+      "name_aliases": [],
+      "restricted": false
+    },
+    {
+      "id": "6f66600e-dd12-11e8-9e55-7f30fbb45e73",
+      "name": "logs_live_tail",
+      "display_name": "Logs Live Tail",
+      "description": "View the live tail feed for all log indexes, even if otherwise specifically restricted.",
+      "group_name": "Log Management",
+      "name_aliases": [],
+      "restricted": false
+    },
+    {
+      "id": "d90f6830-d3d8-11e9-a77a-b3404e5e9ee2",
+      "name": "dashboards_read",
+      "display_name": "Dashboards Read",
+      "description": "View dashboards.",
+      "group_name": "Dashboards",
+      "name_aliases": [],
+      "restricted": true
+    }
+  ]
+}

@@ -20,7 +20,6 @@ const PERMISSIONS_SNAPSHOT: &str = "docs/datadog-permissions.json";
 
 const GUEST_TOKEN_DIGEST: &str = include_str!("../../scripts/datadog-guest-token-digest.sh");
 const CURRENT_USER: &str = include_str!("../../scripts/datadog-current-user.sh");
-const TOKEN_SCOPES: &str = include_str!("../../scripts/datadog-token-scopes.sh");
 
 pub(crate) fn login(vm: &str) -> anyhow::Result<()> {
     let access_token = read_secret(SECRET_REFERENCE)?;
@@ -73,7 +72,7 @@ pub(crate) fn assert_permissions(vm: &str) -> anyhow::Result<()> {
             .flush()
             .context("failed to print the permissions diff")?;
         bail!(
-            "The Datadog identity, roles, or permissions do not match the documented snapshot.\n\
+            "The Datadog permissions do not match the documented snapshot.\n\
              If the change is intentional, review it with: just dump-datadog-permissions"
         );
     }
@@ -107,8 +106,7 @@ fn assert_current_token(vm: &str) -> anyhow::Result<()> {
 
 fn live_permissions(vm: &str) -> anyhow::Result<String> {
     let current_user = guest::capture(vm, CURRENT_USER)?;
-    let token_scopes = guest::capture(vm, TOKEN_SCOPES)?;
-    let snapshot = permissions::normalize(&current_user, &token_scopes)?;
+    let snapshot = permissions::normalize(&current_user)?;
 
     let mut json = serde_json::to_string_pretty(&snapshot)
         .context("failed to serialize the Datadog permissions snapshot")?;
