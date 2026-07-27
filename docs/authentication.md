@@ -18,6 +18,8 @@ Sign in to the 1Password CLI on the host, then configure and verify the guest:
 just login-datadog
 ```
 
+### Datadog Permissions
+
 Check that the guest has the current token from 1Password and that its effective
 permissions match the documented [permissions snapshot](datadog-permissions.json):
 
