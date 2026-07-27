@@ -31,7 +31,7 @@ login-datadog:
     scripts/login-datadog.sh "{{ vm }}"
 
 login-fastly:
-    limactl shell "{{ vm }}" bash -lc 'fastly auth login'
+    scripts/login-fastly.sh "{{ vm }}"
 
 # Upgrade manually. Upgrades are not done in `system.sh` because
 # a full upgrade would make startup slower, less predictable, and could install kernel updates requiring another reboot.
