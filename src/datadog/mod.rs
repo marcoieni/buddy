@@ -83,19 +83,7 @@ pub(crate) fn assert_permissions(vm: &str) -> anyhow::Result<()> {
 }
 
 fn assert_current_token(vm: &str) -> anyhow::Result<()> {
-    let expected_token = read_secret(SECRET_REFERENCE)?;
-    if !expected_token.starts_with("ddsat_") {
-        bail!(
-            "Expected the 1Password item to contain a Datadog service access token (prefix: ddsat_)."
-        );
-    }
-
-    let expected_digest = Sha256::digest(expected_token.as_bytes())
-        .iter()
-        .map(|byte| format!("{byte:02x}"))
-        .collect::<String>();
-    drop(expected_token);
-
+    let expected_digest = expected_token_digest()?;
     let guest_digest = guest::capture(vm, GUEST_TOKEN_DIGEST)?;
     if guest_digest.trim_end() != expected_digest {
         bail!(
@@ -103,6 +91,20 @@ fn assert_current_token(vm: &str) -> anyhow::Result<()> {
         );
     }
     Ok(())
+}
+
+fn expected_token_digest() -> anyhow::Result<String> {
+    let expected_token = read_secret(SECRET_REFERENCE)?;
+    if !expected_token.starts_with("ddsat_") {
+        bail!(
+            "Expected the 1Password item to contain a Datadog service access token (prefix: ddsat_)."
+        );
+    }
+
+    Ok(Sha256::digest(expected_token.as_bytes())
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect())
 }
 
 fn live_permissions(vm: &str) -> anyhow::Result<String> {
