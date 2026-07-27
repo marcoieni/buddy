@@ -24,11 +24,7 @@ pub(crate) fn read_secret(reference: &str) -> anyhow::Result<String> {
     Ok(output.trim_end_matches(['\r', '\n']).to_owned())
 }
 
-pub(crate) fn install_guest(
-    vm: &str,
-    credentials_name: &str,
-    credentials: &[u8],
-) -> anyhow::Result<()> {
+fn install_guest(vm: &str, credentials_name: &str, credentials: &[u8]) -> anyhow::Result<()> {
     if Path::new(credentials_name).file_name() != Some(OsStr::new(credentials_name)) {
         bail!("Expected a credentials filename, not a path.");
     }
@@ -62,7 +58,38 @@ pub(crate) fn install_guest(
     write_result.context("failed to send credentials to the guest")
 }
 
-pub(crate) fn shell_quote(value: &str) -> String {
+pub(crate) fn install_guest_env(
+    vm: &str,
+    credentials_name: &str,
+    environment: &[(&str, &str)],
+) -> anyhow::Result<()> {
+    let credentials = serialize_env(environment)?;
+    install_guest(vm, credentials_name, credentials.as_bytes())
+}
+
+fn serialize_env(environment: &[(&str, &str)]) -> anyhow::Result<String> {
+    let mut credentials = String::new();
+    for &(name, value) in environment {
+        if !is_valid_env_name(name) {
+            bail!("Invalid environment variable name: {name:?}");
+        }
+        credentials.push_str("export ");
+        credentials.push_str(name);
+        credentials.push('=');
+        credentials.push_str(&shell_quote(value));
+        credentials.push('\n');
+    }
+
+    Ok(credentials)
+}
+
+fn is_valid_env_name(name: &str) -> bool {
+    let mut characters = name.bytes();
+    matches!(characters.next(), Some(b'A'..=b'Z' | b'a'..=b'z' | b'_'))
+        && characters.all(|character| character.is_ascii_alphanumeric() || character == b'_')
+}
+
+fn shell_quote(value: &str) -> String {
     format!("'{}'", value.replace('\'', "'\\''"))
 }
 
@@ -75,5 +102,29 @@ mod tests {
         assert_eq!(shell_quote(""), "''");
         assert_eq!(shell_quote("plain"), "'plain'");
         assert_eq!(shell_quote("a b'$HOME"), "'a b'\\''$HOME'");
+    }
+
+    #[test]
+    fn validates_environment_variable_names() {
+        for name in ["A", "_", "DD_ACCESS_TOKEN", "value2"] {
+            assert!(is_valid_env_name(name), "{name:?} should be valid");
+        }
+        for name in ["", "2_VALUE", "A-B", "A=B", "A B", "A\nB"] {
+            assert!(!is_valid_env_name(name), "{name:?} should be invalid");
+        }
+    }
+
+    #[test]
+    fn serializes_environment_variables() {
+        assert_eq!(
+            serialize_env(&[("TOKEN", "a b'$HOME"), ("ENABLED", "1")]).unwrap(),
+            "export TOKEN='a b'\\''$HOME'\nexport ENABLED='1'\n"
+        );
+        assert_eq!(
+            serialize_env(&[("TOKEN; echo injected", "secret")])
+                .unwrap_err()
+                .to_string(),
+            "Invalid environment variable name: \"TOKEN; echo injected\""
+        );
     }
 }

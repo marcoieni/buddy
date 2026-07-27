@@ -9,7 +9,7 @@ use sha2::{Digest, Sha256};
 use similar::TextDiff;
 
 use crate::{
-    credentials::{install_guest, read_secret, shell_quote},
+    credentials::{install_guest_env, read_secret},
     guest, snapshot,
 };
 
@@ -28,12 +28,14 @@ pub(crate) fn login(vm: &str) -> anyhow::Result<()> {
         bail!("Expected a Datadog service access token (prefix: ddsat_).");
     }
 
-    let credentials = format!(
-        "export DD_ACCESS_TOKEN={}\nexport DD_SITE={}\n",
-        shell_quote(&access_token),
-        shell_quote("https://app.datadoghq.com/")
-    );
-    install_guest(vm, "datadog.env", credentials.as_bytes())?;
+    install_guest_env(
+        vm,
+        "datadog.env",
+        &[
+            ("DD_ACCESS_TOKEN", &access_token),
+            ("DD_SITE", "https://app.datadoghq.com/"),
+        ],
+    )?;
 
     guest::run(vm, "pup monitors list --limit 1 --read-only")?;
     println!("Datadog authentication is configured and working.");
