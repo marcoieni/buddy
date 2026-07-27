@@ -68,17 +68,13 @@ externally by Buddy rather than by a stored CLI profile.
 Do not create a token during normal setup because the token already exists.
 Create a new token from scratch only when the old one has expired:
 
-1. Open [Fastly Account > API tokens](https://manage.fastly.com/account/personal/tokens)
-   as a superuser and switch to sudo mode.
-2. Open **Account tokens**. If an automation token named `buddy` exists,
-   revoke it.
-3. Select **Create token**, name it `buddy`, and choose **Automation token**.
-4. Choose the least-privileged role that provides the required visibility,
-   disable TLS management, and select the `global:read` scope.
-5. Limit access to the services Buddy needs when practical and choose an
-   expiration date.
-6. Create and immediately copy the token. Fastly shows the secret only once.
-7. Replace `credential` in the 1Password `fastly-read-only` item with the new
+1. Open [Account > API tokens > Account tokens](https://manage.fastly.com/account/tokens). If an automation token named `buddy-read-only` exists, revoke it.
+2. Open [Account > API tokens > Personal tokens](https://manage.fastly.com/account/personal/tokens).
+3. Select **Create token**, name it `buddy-read-only`, and choose the settings of the screenshot below.
+4. Create and immediately copy the token. Fastly shows the secret only once.
+5. Replace `credential` in the 1Password `fastly-read-only` item with the new
    token.
-8. Run `just login-fastly`. This copies the replacement into the VM and
+6. Run `just login-fastly`. This copies the replacement into the VM and
    verifies it with a read-only Fastly request.
+
+![token options](fastly-token.png)
