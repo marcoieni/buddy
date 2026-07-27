@@ -118,6 +118,9 @@ for more details.
   is why we should use tokens with an expiration date.
   - Rotate tokens before they expire, and revoke a token immediately if the VM
     or token might have been compromised.
+- Keep credentials out of ordinary cloud configuration. For example, Fastly `global:read`
+  correctly treats VCL as readable configuration, so a credential embedded in
+  VCL is exposed even though protected secret fields remain unavailable.
 
 ## FAQ
 
