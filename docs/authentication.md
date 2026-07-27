@@ -41,8 +41,7 @@ Create a new token from scratch only when the old one has expired:
 
 ## Fastly authentication
 
-Buddy uses a [Fastly automation token](https://www.fastly.com/documentation/guides/account-info/user-and-account-management/using-api-tokens/)
-for this non-interactive use case. Unlike a user token, an automation token is
+Buddy uses a [Fastly automation token](https://www.fastly.com/documentation/guides/account-info/user-and-account-management/using-api-tokens/). Unlike a user token, an automation token is
 not tied to an employee's account lifecycle. The token has the `global:read`
 scope, is limited to only the required services when practical, and has an
 expiration date.
