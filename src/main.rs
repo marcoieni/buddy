@@ -3,7 +3,7 @@ use std::{
     fs,
     io::{self, Write},
     os::unix::fs::PermissionsExt,
-    path::{Path, PathBuf},
+    path::Path,
     process::{Command, ExitCode, Stdio},
 };
 
@@ -16,6 +16,7 @@ use similar::TextDiff;
 use tempfile::Builder;
 
 const DATADOG_SECRET_REFERENCE: &str = "op://Infrastructure/datadog-read-only/credential";
+const DATADOG_PERMISSIONS_SNAPSHOT: &str = "docs/datadog-permissions.json";
 const FASTLY_SECRET_REFERENCE: &str = "op://Infrastructure/fastly-read-only/credential";
 
 const INSTALL_GUEST_CREDENTIALS: &str = r#"
@@ -106,15 +107,11 @@ enum DatadogPermissionsAction {
     Dump {
         /// Lima VM name.
         vm: String,
-        /// Destination snapshot.
-        snapshot: PathBuf,
     },
     /// Compare the VM's current Datadog permissions with a snapshot.
     Assert {
         /// Lima VM name.
         vm: String,
-        /// Expected snapshot.
-        snapshot: PathBuf,
     },
 }
 
@@ -167,12 +164,8 @@ fn run() -> Result<()> {
         Commands::LoginDatadog { vm } => login_datadog(&vm),
         Commands::LoginFastly { vm } => login_fastly(&vm),
         Commands::DatadogPermissions { action } => match action {
-            DatadogPermissionsAction::Dump { vm, snapshot } => {
-                dump_datadog_permissions(&vm, &snapshot)
-            }
-            DatadogPermissionsAction::Assert { vm, snapshot } => {
-                assert_datadog_permissions(&vm, &snapshot)
-            }
+            DatadogPermissionsAction::Dump { vm } => dump_datadog_permissions(&vm),
+            DatadogPermissionsAction::Assert { vm } => assert_datadog_permissions(&vm),
         },
     }
 }
@@ -212,7 +205,8 @@ fn login_fastly(vm: &str) -> Result<()> {
     Ok(())
 }
 
-fn dump_datadog_permissions(vm: &str, snapshot: &Path) -> Result<()> {
+fn dump_datadog_permissions(vm: &str) -> Result<()> {
+    let snapshot = Path::new(DATADOG_PERMISSIONS_SNAPSHOT);
     assert_current_datadog_token(vm)?;
     let live_snapshot = live_datadog_permissions(vm)?;
     write_snapshot(snapshot, live_snapshot.as_bytes())?;
@@ -223,7 +217,8 @@ fn dump_datadog_permissions(vm: &str, snapshot: &Path) -> Result<()> {
     Ok(())
 }
 
-fn assert_datadog_permissions(vm: &str, snapshot: &Path) -> Result<()> {
+fn assert_datadog_permissions(vm: &str) -> Result<()> {
+    let snapshot = Path::new(DATADOG_PERMISSIONS_SNAPSHOT);
     assert_current_datadog_token(vm)?;
 
     let expected = fs::read_to_string(snapshot).with_context(|| {

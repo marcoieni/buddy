@@ -31,10 +31,10 @@ login-datadog:
     cargo run --quiet -- login-datadog "{{ vm }}"
 
 dump-datadog-permissions:
-    cargo run --quiet -- datadog-permissions dump "{{ vm }}" docs/datadog-permissions.json
+    cargo run --quiet -- datadog-permissions dump "{{ vm }}"
 
 assert-datadog-credentials:
-    cargo run --quiet -- datadog-permissions assert "{{ vm }}" docs/datadog-permissions.json
+    cargo run --quiet -- datadog-permissions assert "{{ vm }}"
 
 login-fastly:
     cargo run --quiet -- login-fastly "{{ vm }}"
