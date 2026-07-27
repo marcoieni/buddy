@@ -20,32 +20,19 @@ just login-datadog
 
 ### Datadog Permissions
 
-Check that the guest has the current token from 1Password and that its effective
-permissions match the documented [permissions snapshot](datadog-permissions.json):
+Datadog permissions are documented in the [permissions snapshot](datadog-permissions.json).
+
+To assert that the token in 1Password has the same documented permissions, run:
 
 ```sh
 just assert-datadog-credentials
 ```
 
-The assertion compares token hashes without printing or storing the token. It
-then uses Pup's authenticated raw API command to call Datadog's
-`/api/v2/current_user` endpoint. The normalized effective permissions are
-compared with the snapshot. Service-account and role metadata are intentionally
-excluded. This self-introspection does not require permission to list the
-organization's application keys or access tokens.
-
-Pup does not have a dedicated command that lists permissions. Maintainers can
-refresh the snapshot through Pup after intentionally changing the service
-account's effective permissions:
+To refresh the snapshot, run:
 
 ```sh
 just dump-datadog-permissions
-git diff -- docs/datadog-permissions.json
 ```
-
-The dump command first verifies that the VM has the current token from
-1Password, so a stale guest credential cannot replace the documented baseline.
-Review every permission change before committing the updated file.
 
 ### Replace an expired Datadog token
 
