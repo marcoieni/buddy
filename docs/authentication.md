@@ -18,6 +18,22 @@ Sign in to the 1Password CLI on the host, then configure and verify the guest:
 just login-datadog
 ```
 
+### Datadog Permissions
+
+Datadog permissions are documented in the [permissions snapshot](datadog-permissions.json).
+
+To assert that the token in 1Password has the same documented permissions, run:
+
+```sh
+just assert-datadog-credentials
+```
+
+To refresh the snapshot, run:
+
+```sh
+just dump-datadog-permissions
+```
+
 ### Replace an expired Datadog token
 
 Do not create a token during normal setup because the token already exists.
@@ -38,6 +54,8 @@ Create a new token from scratch only when the old one has expired:
    token, which begins with `ddsat_`.
 8. Run `just login-datadog`. This copies the replacement into the VM and verifies
    it with a read-only Datadog request.
+9. Run `just assert-datadog-credentials`. The checked-in permissions should not
+   change when only the token is rotated.
 
 ## Fastly authentication
 
