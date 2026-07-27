@@ -7,20 +7,7 @@ use std::{
 
 use anyhow::{Context, bail};
 
-const INSTALL_GUEST_CREDENTIALS: &str = r#"
-set -Eeuo pipefail
-credentials_dir="$HOME/.config/buddy"
-credentials_file="$credentials_dir/$1"
-
-mkdir -p "$credentials_dir"
-chmod 700 "$credentials_dir"
-umask 077
-cat >"$credentials_file"
-
-source_line="[ ! -r \"$credentials_file\" ] || . \"$credentials_file\""
-grep -Fqx "$source_line" "$HOME/.profile" ||
-    printf "\n%s\n" "$source_line" >>"$HOME/.profile"
-"#;
+const INSTALL_GUEST_CREDENTIALS: &str = include_str!("../scripts/install-guest-credentials.sh");
 
 pub(crate) fn read_secret(reference: &str) -> anyhow::Result<String> {
     let output = Command::new("op")

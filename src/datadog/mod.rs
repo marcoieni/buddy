@@ -18,46 +18,9 @@ mod permissions;
 const SECRET_REFERENCE: &str = "op://Infrastructure/datadog-read-only/credential";
 const PERMISSIONS_SNAPSHOT: &str = "docs/datadog-permissions.json";
 
-const GUEST_TOKEN_DIGEST: &str = r#"
-set -Eeuo pipefail
-if [[ "${DD_ACCESS_TOKEN:-}" != ddsat_* ]]; then
-    echo "The guest does not have a Datadog service access token. Run: just login-datadog" >&2
-    exit 1
-fi
-printf "%s" "$DD_ACCESS_TOKEN" | sha256sum | awk "{print \$1}"
-"#;
-
-const CURRENT_USER: &str = r#"
-set -Eeuo pipefail
-pup api v2/current_user --output json --read-only
-"#;
-
-const TOKEN_SCOPES: &str = r#"
-set -Eeuo pipefail
-pup api v2/personal_access_tokens \
-    --field "filter=buddy" \
-    --field "page[size]=100" \
-    --output json \
-    --read-only |
-    jq -e "
-        [
-            .data[]
-            | select(.type == \"service_access_tokens\")
-            | . as \$access_token
-            | select(
-                env.DD_ACCESS_TOKEN
-                | startswith(\$access_token.attributes.public_portion)
-            )
-        ]
-        | if length == 1 then
-            {scopes: (.[0].attributes.scopes | sort)}
-          else
-            error(
-                \"expected exactly one access-token record matching DD_ACCESS_TOKEN\"
-            )
-          end
-    "
-"#;
+const GUEST_TOKEN_DIGEST: &str = include_str!("../../scripts/datadog-guest-token-digest.sh");
+const CURRENT_USER: &str = include_str!("../../scripts/datadog-current-user.sh");
+const TOKEN_SCOPES: &str = include_str!("../../scripts/datadog-token-scopes.sh");
 
 pub(crate) fn login(vm: &str) -> anyhow::Result<()> {
     let access_token = read_secret(SECRET_REFERENCE)?;

@@ -49,7 +49,7 @@ rebuild: delete create
 
 validate:
     limactl template validate buddy.yaml
-    shellcheck provision/*.sh
+    shellcheck provision/*.sh scripts/*.sh
     cargo fmt --check
     cargo clippy --all-targets -- -D warnings
     cargo test
