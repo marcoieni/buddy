@@ -19,7 +19,6 @@ fi
 printf 'export FASTLY_API_TOKEN=%q\nexport FASTLY_DISABLE_AUTH_COMMAND=1\n' "$api_token" |
     install_guest_credentials "$vm" fastly.env
 
-# Verify the saved credentials with a minimal read-only API request. The
-# externally managed environment intentionally disables `fastly whoami`.
+# Verify the saved credentials with a minimal API request.
 limactl shell "$vm" bash -lc 'fastly service list --per-page 1 >/dev/null'
 echo "Fastly authentication is configured and working."
