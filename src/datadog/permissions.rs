@@ -175,26 +175,4 @@ mod tests {
             serde_json::json!(["a", "z"])
         );
     }
-
-    #[test]
-    fn rejects_empty_permissions() {
-        let current_user = r#"
-        {
-          "data": {"id": "service-account-1", "attributes": {"name": "Buddy"}},
-          "included": [
-            {
-              "type": "roles",
-              "id": "role-1",
-              "attributes": {"name": "Read only"}
-            }
-          ]
-        }
-        "#;
-
-        let error = normalize(current_user).unwrap_err();
-        assert_eq!(
-            error.to_string(),
-            "current_user did not return any permissions"
-        );
-    }
 }

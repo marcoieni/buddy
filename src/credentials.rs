@@ -24,6 +24,11 @@ pub(crate) fn read_secret(reference: &str) -> anyhow::Result<String> {
     Ok(output.trim().to_owned())
 }
 
+/// Installs credentials in the guest's Buddy config directory.
+///
+/// The credentials are sent over stdin so they never appear in the `limactl`
+/// arguments. The bundled script creates the destination with restrictive
+/// permissions and adds it to the guest's shell profile.
 fn install_guest(vm: &str, credentials_name: &str, credentials: &[u8]) -> anyhow::Result<()> {
     if Path::new(credentials_name).file_name() != Some(OsStr::new(credentials_name)) {
         bail!("Expected a credentials filename, not a path.");
