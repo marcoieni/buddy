@@ -5,6 +5,7 @@ use std::{
 
 use anyhow::{Context, bail};
 
+// Run a command capturing stdout
 pub(crate) fn capture(vm: &str, script: &str) -> anyhow::Result<String> {
     let output = Command::new("limactl")
         .args(["shell", vm, "bash", "-lc", script])
