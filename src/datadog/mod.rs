@@ -10,7 +10,7 @@ use similar::TextDiff;
 
 use crate::{
     credentials::{install_guest_env, read_secret},
-    guest, snapshot,
+    guest,
 };
 
 mod permissions;
@@ -45,7 +45,8 @@ pub(crate) fn dump_permissions(vm: &str) -> anyhow::Result<()> {
     let path = Path::new(PERMISSIONS_SNAPSHOT);
     assert_current_token(vm)?;
     let live_snapshot = live_permissions(vm)?;
-    snapshot::write(path, live_snapshot.as_bytes())?;
+    fs::write(path, live_snapshot)
+        .with_context(|| format!("failed to write permissions snapshot {path:?}"))?;
     println!("Wrote the current Datadog permissions to {path:?}");
     Ok(())
 }
