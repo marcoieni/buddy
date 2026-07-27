@@ -28,16 +28,16 @@ login-codex:
     limactl shell "{{ vm }}" bash -lc 'codex login --device-auth'
 
 login-datadog:
-    scripts/login-datadog.sh "{{ vm }}"
+    cargo run --quiet -- login-datadog "{{ vm }}"
 
 dump-datadog-permissions:
-    scripts/datadog-permissions.sh dump "{{ vm }}" docs/datadog-permissions.json
+    cargo run --quiet -- datadog-permissions dump "{{ vm }}" docs/datadog-permissions.json
 
 assert-datadog-credentials:
-    scripts/datadog-permissions.sh assert "{{ vm }}" docs/datadog-permissions.json
+    cargo run --quiet -- datadog-permissions assert "{{ vm }}" docs/datadog-permissions.json
 
 login-fastly:
-    scripts/login-fastly.sh "{{ vm }}"
+    cargo run --quiet -- login-fastly "{{ vm }}"
 
 # Upgrade manually. Upgrades are not done in `system.sh` because
 # a full upgrade would make startup slower, less predictable, and could install kernel updates requiring another reboot.
@@ -49,7 +49,10 @@ rebuild: delete create
 
 validate:
     limactl template validate buddy.yaml
-    shellcheck provision/*.sh scripts/*.sh
+    shellcheck provision/*.sh
+    cargo fmt --check
+    cargo clippy --all-targets -- -D warnings
+    cargo test
 
 shell:
     limactl shell "{{ vm }}"

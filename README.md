@@ -16,7 +16,8 @@ So place there all the projects you want to work on with codex.
 
 ## Set up
 
-- Install the required tools on the host (eg on MacOS):
+- Install the required tools on the host (eg on MacOS), along with a
+  [Rust toolchain](https://rustup.rs/):
 
   ```sh
   brew install lima just
