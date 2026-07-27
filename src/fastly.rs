@@ -1,4 +1,4 @@
-use anyhow::{Result, bail};
+use anyhow::bail;
 
 use crate::{
     credentials::{install_guest, read_secret, shell_quote},
@@ -7,7 +7,7 @@ use crate::{
 
 const SECRET_REFERENCE: &str = "op://Infrastructure/fastly-read-only/credential";
 
-pub(crate) fn login(vm: &str) -> Result<()> {
+pub(crate) fn login(vm: &str) -> anyhow::Result<()> {
     let api_token = read_secret(SECRET_REFERENCE)?;
     if api_token.is_empty() {
         bail!("Expected a non-empty Fastly API token.");

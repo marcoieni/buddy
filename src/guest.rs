@@ -1,8 +1,8 @@
 use std::process::{Command, Stdio};
 
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, bail};
 
-pub(crate) fn run(vm: &str, script: &str) -> Result<()> {
+pub(crate) fn run(vm: &str, script: &str) -> anyhow::Result<()> {
     let status = Command::new("limactl")
         .args(["shell", vm, "bash", "-lc", script])
         .status()
@@ -13,7 +13,7 @@ pub(crate) fn run(vm: &str, script: &str) -> Result<()> {
     Ok(())
 }
 
-pub(crate) fn capture(vm: &str, script: &str) -> Result<String> {
+pub(crate) fn capture(vm: &str, script: &str) -> anyhow::Result<String> {
     let output = Command::new("limactl")
         .args(["shell", vm, "bash", "-lc", script])
         .stdout(Stdio::piped())

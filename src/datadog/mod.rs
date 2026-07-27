@@ -4,7 +4,7 @@ use std::{
     path::Path,
 };
 
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, bail};
 use sha2::{Digest, Sha256};
 use similar::TextDiff;
 
@@ -59,7 +59,7 @@ pup api v2/personal_access_tokens \
     "
 "#;
 
-pub(crate) fn login(vm: &str) -> Result<()> {
+pub(crate) fn login(vm: &str) -> anyhow::Result<()> {
     let access_token = read_secret(SECRET_REFERENCE)?;
     if !access_token.starts_with("ddsat_") {
         bail!("Expected a Datadog service access token (prefix: ddsat_).");
@@ -77,7 +77,7 @@ pub(crate) fn login(vm: &str) -> Result<()> {
     Ok(())
 }
 
-pub(crate) fn dump_permissions(vm: &str) -> Result<()> {
+pub(crate) fn dump_permissions(vm: &str) -> anyhow::Result<()> {
     let path = Path::new(PERMISSIONS_SNAPSHOT);
     assert_current_token(vm)?;
     let live_snapshot = live_permissions(vm)?;
@@ -89,7 +89,7 @@ pub(crate) fn dump_permissions(vm: &str) -> Result<()> {
     Ok(())
 }
 
-pub(crate) fn assert_permissions(vm: &str) -> Result<()> {
+pub(crate) fn assert_permissions(vm: &str) -> anyhow::Result<()> {
     let path = Path::new(PERMISSIONS_SNAPSHOT);
     assert_current_token(vm)?;
 
@@ -124,7 +124,7 @@ pub(crate) fn assert_permissions(vm: &str) -> Result<()> {
     Ok(())
 }
 
-fn assert_current_token(vm: &str) -> Result<()> {
+fn assert_current_token(vm: &str) -> anyhow::Result<()> {
     let expected_token = read_secret(SECRET_REFERENCE)?;
     if !expected_token.starts_with("ddsat_") {
         bail!(
@@ -147,7 +147,7 @@ fn assert_current_token(vm: &str) -> Result<()> {
     Ok(())
 }
 
-fn live_permissions(vm: &str) -> Result<String> {
+fn live_permissions(vm: &str) -> anyhow::Result<String> {
     let current_user = guest::capture(vm, CURRENT_USER)?;
     let token_scopes = guest::capture(vm, TOKEN_SCOPES)?;
     let snapshot = permissions::normalize(&current_user, &token_scopes)?;

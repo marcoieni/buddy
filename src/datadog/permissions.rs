@@ -1,4 +1,4 @@
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, bail};
 use serde::Serialize;
 use serde_json::Value;
 
@@ -39,7 +39,7 @@ struct Permission {
 pub(super) fn normalize(
     current_user_json: &str,
     token_scopes_json: &str,
-) -> Result<PermissionsSnapshot> {
+) -> anyhow::Result<PermissionsSnapshot> {
     let response: Value = serde_json::from_str(current_user_json)
         .context("current_user did not return valid JSON")?;
     let token: Value = serde_json::from_str(token_scopes_json)
@@ -94,7 +94,7 @@ pub(super) fn normalize(
     })
 }
 
-fn normalize_role(item: &Value) -> Result<Role> {
+fn normalize_role(item: &Value) -> anyhow::Result<Role> {
     let mut permissions = string_array_at(item, ("/relationships/permissions/data", "/id"))
         .context("a Datadog role returned invalid permissions")?;
     permissions.sort();
@@ -107,7 +107,7 @@ fn normalize_role(item: &Value) -> Result<Role> {
     })
 }
 
-fn normalize_permission(item: &Value) -> Result<Permission> {
+fn normalize_permission(item: &Value) -> anyhow::Result<Permission> {
     let mut name_aliases = optional_string_array_at(item, "/attributes/name_aliases")
         .context("a Datadog permission returned invalid name aliases")?;
     name_aliases.sort();
@@ -128,11 +128,11 @@ fn string_at(value: &Value, pointer: &str) -> Option<String> {
 }
 
 trait StringArrayAt {
-    fn read(self, value: &Value) -> Result<Vec<String>>;
+    fn read(self, value: &Value) -> anyhow::Result<Vec<String>>;
 }
 
 impl StringArrayAt for &str {
-    fn read(self, value: &Value) -> Result<Vec<String>> {
+    fn read(self, value: &Value) -> anyhow::Result<Vec<String>> {
         let array = value
             .pointer(self)
             .and_then(Value::as_array)
@@ -150,7 +150,7 @@ impl StringArrayAt for &str {
 }
 
 impl StringArrayAt for (&str, &str) {
-    fn read(self, value: &Value) -> Result<Vec<String>> {
+    fn read(self, value: &Value) -> anyhow::Result<Vec<String>> {
         let (array_pointer, item_pointer) = self;
         let array = match value.pointer(array_pointer) {
             None | Some(Value::Null) => return Ok(Vec::new()),
@@ -170,11 +170,11 @@ impl StringArrayAt for (&str, &str) {
     }
 }
 
-fn string_array_at<A: StringArrayAt>(value: &Value, pointer: A) -> Result<Vec<String>> {
+fn string_array_at<A: StringArrayAt>(value: &Value, pointer: A) -> anyhow::Result<Vec<String>> {
     pointer.read(value)
 }
 
-fn optional_string_array_at(value: &Value, pointer: &str) -> Result<Vec<String>> {
+fn optional_string_array_at(value: &Value, pointer: &str) -> anyhow::Result<Vec<String>> {
     match value.pointer(pointer) {
         None | Some(Value::Null) => Ok(Vec::new()),
         Some(_) => string_array_at(value, pointer),

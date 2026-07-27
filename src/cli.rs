@@ -1,4 +1,3 @@
-use anyhow::Result;
 use clap::{Parser, Subcommand};
 
 use crate::{datadog, fastly};
@@ -43,7 +42,7 @@ enum DatadogPermissionsAction {
     },
 }
 
-pub(crate) fn run() -> Result<()> {
+pub(crate) fn run() -> anyhow::Result<()> {
     match Cli::parse().command {
         Commands::LoginDatadog { vm } => datadog::login(&vm),
         Commands::LoginFastly { vm } => fastly::login(&vm),

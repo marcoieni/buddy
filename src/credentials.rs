@@ -5,7 +5,7 @@ use std::{
     process::{Command, Stdio},
 };
 
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, bail};
 
 const INSTALL_GUEST_CREDENTIALS: &str = r#"
 set -Eeuo pipefail
@@ -22,7 +22,7 @@ grep -Fqx "$source_line" "$HOME/.profile" ||
     printf "\n%s\n" "$source_line" >>"$HOME/.profile"
 "#;
 
-pub(crate) fn read_secret(reference: &str) -> Result<String> {
+pub(crate) fn read_secret(reference: &str) -> anyhow::Result<String> {
     let output = Command::new("op")
         .args(["read", reference])
         .stdout(Stdio::piped())
@@ -37,7 +37,11 @@ pub(crate) fn read_secret(reference: &str) -> Result<String> {
     Ok(output.trim_end_matches(['\r', '\n']).to_owned())
 }
 
-pub(crate) fn install_guest(vm: &str, credentials_name: &str, credentials: &[u8]) -> Result<()> {
+pub(crate) fn install_guest(
+    vm: &str,
+    credentials_name: &str,
+    credentials: &[u8],
+) -> anyhow::Result<()> {
     if Path::new(credentials_name).file_name() != Some(OsStr::new(credentials_name)) {
         bail!("Expected a credentials filename, not a path.");
     }

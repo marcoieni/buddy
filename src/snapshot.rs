@@ -1,9 +1,9 @@
 use std::{ffi::OsStr, fs, io::Write, os::unix::fs::PermissionsExt, path::Path};
 
-use anyhow::{Context, Result};
+use anyhow::Context;
 use tempfile::Builder;
 
-pub(crate) fn write(path: &Path, contents: &[u8]) -> Result<()> {
+pub(crate) fn write(path: &Path, contents: &[u8]) -> anyhow::Result<()> {
     let parent = path
         .parent()
         .filter(|path| !path.as_os_str().is_empty())
