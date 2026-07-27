@@ -19,7 +19,7 @@ pub(crate) fn login(vm: &str) -> anyhow::Result<()> {
     );
     install_guest(vm, "fastly.env", credentials.as_bytes())?;
 
-    guest::run(vm, "fastly service list --per-page 1 >/dev/null")?;
+    guest::run(vm, "fastly service list --per-page 1")?;
     println!("Fastly authentication is configured and working.");
     Ok(())
 }

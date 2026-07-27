@@ -1,10 +1,15 @@
-use std::process::{Command, Stdio};
+use std::{
+    io::{self, Write},
+    process::{Command, Stdio},
+};
 
 use anyhow::{Context, bail};
 
 pub(crate) fn run(vm: &str, script: &str) -> anyhow::Result<()> {
     let status = Command::new("limactl")
         .args(["shell", vm, "bash", "-lc", script])
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
         .status()
         .context("failed to run limactl")?;
     if !status.success() {
@@ -21,6 +26,12 @@ pub(crate) fn capture(vm: &str, script: &str) -> anyhow::Result<String> {
         .output()
         .context("failed to run limactl")?;
     if !output.status.success() {
+        io::stdout()
+            .write_all(&output.stdout)
+            .context("failed to relay limactl stdout")?;
+        io::stdout()
+            .flush()
+            .context("failed to flush limactl stdout")?;
         bail!("limactl exited with {}", output.status);
     }
     String::from_utf8(output.stdout).context("limactl returned non-UTF-8 output")

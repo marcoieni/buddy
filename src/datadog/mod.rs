@@ -72,7 +72,7 @@ pub(crate) fn login(vm: &str) -> anyhow::Result<()> {
     );
     install_guest(vm, "datadog.env", credentials.as_bytes())?;
 
-    guest::run(vm, "pup monitors list --limit 1 --read-only >/dev/null")?;
+    guest::run(vm, "pup monitors list --limit 1 --read-only")?;
     println!("Datadog authentication is configured and working.");
     Ok(())
 }
