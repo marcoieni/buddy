@@ -9,8 +9,6 @@ vm="${1:?Usage: login-fastly.sh VM}"
 # Fetch the automation token on the host.
 api_token="$(op read "op://Infrastructure/fastly-read-only/credential")"
 
-# Fastly does not document a stable prefix for API tokens, so authentication
-# below is the authoritative validation.
 if [[ -z "$api_token" ]]; then
     echo "Expected a non-empty Fastly API token." >&2
     exit 1
