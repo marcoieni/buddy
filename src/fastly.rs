@@ -41,7 +41,9 @@ pub(crate) async fn login(vm: &str) -> anyhow::Result<()> {
         ],
     )?;
 
+    // Test that Fastly authentication is working.
     guest::capture(vm, "fastly service list --per-page 1")?;
+
     println!("Fastly authentication is configured and working.");
     Ok(())
 }
