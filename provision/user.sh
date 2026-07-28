@@ -23,6 +23,16 @@ eval "$brew_shellenv"
 # Make brew available to other login shells
 append_line_if_missing "$brew_shellenv" "$HOME/.profile"
 
+# Install Rust through rustup and make the toolchain available to login shells.
+rustup_bin="$HOME/.cargo/bin/rustup"
+if [[ ! -x "$rustup_bin" ]]; then
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs |
+    sh -s -- -y --no-modify-path
+fi
+"$rustup_bin" toolchain install stable
+"$rustup_bin" default stable
+append_line_if_missing "source \"\$HOME/.cargo/env\"" "$HOME/.profile"
+
 brew install datadog-labs/pack/pup
 brew install fastly/tap/fastly
 
