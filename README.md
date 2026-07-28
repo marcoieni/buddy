@@ -31,7 +31,7 @@ So place there all the projects you want to work on with codex.
      op --version
      ```
 
-  2. If not, install it. Eg. on MacOS:
+  2. If not, install it. E.g. on MacOS:
 
      ```sh
      brew install 1password-cli
