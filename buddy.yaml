@@ -1,6 +1,6 @@
 # Docs: https://lima-vm.io/docs/config/
 
-minimumLimaVersion: 2.1.2
+minimumLimaVersion: 2.2.0
 
 # Use only the Ubuntu image definition. Do not inherit template:default or
 # template:ubuntu-26.04 here: those templates also inherit Lima's default
@@ -15,6 +15,11 @@ propagateProxyEnv: false
 ssh:
   forwardAgent: false
   loadDotSSHPubKeys: false
+
+# Codex can elevate to root inside the VM
+# without receiving or storing the guest user's password.
+user:
+  passwordlessSudo: true
 
 cpus: 8
 memory: "10GiB"

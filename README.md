@@ -122,6 +122,28 @@ for more details.
   correctly treats VCL as readable configuration, so a credential embedded in
   VCL is exposed even though protected secret fields remain unavailable.
 
+### Passwordless sudo
+
+The template explicitly sets `user.passwordlessSudo: true`, which is
+[Lima's default for Linux guests](https://lima-vm.io/docs/config/sudo/).
+This gives Codex unrestricted root access inside the guest, but does not grant
+root access on the host. The VM boundary and the resources exposed to the VM,
+such as the writable `/work` mount, remain the main security boundary.
+
+Enabling passwordless sudo has this advantage:
+
+- Codex and other automation can install packages, update the guest, and fix
+  system configuration without waiting for a password prompt.
+
+It also has these disadvantages:
+
+- Any process or untrusted project code running as the guest user can silently
+  become guest root.
+- A compromised process can change the guest operating system and access
+  credentials, files, and processes belonging to other users in the guest.
+- It offers no guest privilege boundary to contain accidental destructive
+  system changes.
+
 ## FAQ
 
 > Why not running Codex directly on the host?
