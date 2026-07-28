@@ -60,6 +60,10 @@ struct ApiResponse {
     body: String,
 }
 
+// Verify that the token ...
+// Fastly restricts automation-token metadata to credentials with account
+// management permissions, which the **User** role intentionally lacks.
+// ...
 async fn assert_token_metadata(api_token: &str) -> anyhow::Result<()> {
     let client = Client::builder()
         .redirect(Policy::none())

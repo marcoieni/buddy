@@ -86,12 +86,6 @@ Fastly's current-token API. Login fails unless the token has exactly the
 `global:read` scope and an expiration date in the future. Buddy then verifies
 the installed token with a read-only Fastly request.
 
-Fastly restricts automation-token metadata to credentials with account
-management permissions, which the **User** role intentionally lacks. Buddy
-therefore can't verify the token type or TLS setting without a second,
-privileged credential. Those properties must be checked against the documented
-settings when the token is created.
-
 ### Permissions
 
 Fastly `global:read` can't read Fastly Secret Store values.
