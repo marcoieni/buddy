@@ -16,8 +16,9 @@ So place there all the projects you want to work on with codex.
 
 ## Set up
 
-- Install the required tools on the host (eg on MacOS), along with a
-  [Rust toolchain](https://rustup.rs/):
+- Install the [Rust toolchain](https://rustup.rs/).
+
+- Install the required tools on the host. E.g. on MacOS:
 
   ```sh
   brew install lima just
@@ -30,7 +31,7 @@ So place there all the projects you want to work on with codex.
      op --version
      ```
 
-  2. If not, install it with Homebrew:
+  2. If not, install it. E.g. on MacOS:
 
      ```sh
      brew install 1password-cli
@@ -50,16 +51,13 @@ So place there all the projects you want to work on with codex.
   you are experiencing issues, check the
   [authentication docs](./docs/authentication.md).
 
+- Enable "Device code authorization for Codex" in
+  [ChatGPT security settings](https://chatgpt.com/#settings/Security).
+
 - Login to Codex, Datadog and Fastly from the guest:
 
   ```sh
   just login
-  ```
-
-- Start the VM:
-
-  ```sh
-  just start
   ```
 
 This is enough to run codex in the VM, but you can also connect from ChatGPT desktop

@@ -50,15 +50,8 @@ pub(crate) async fn login(vm: &str) -> anyhow::Result<()> {
 
 #[derive(Debug, Deserialize)]
 struct TokenMetadata {
-    id: String,
     scope: String,
     expires_at: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-struct AutomationTokenMetadata {
-    id: String,
-    tls_access: bool,
 }
 
 #[derive(Debug)]
@@ -67,6 +60,14 @@ struct ApiResponse {
     body: String,
 }
 
+/// Verifies the token metadata available from Fastly's `/tokens/self` endpoint.
+///
+/// This checks that the token has exactly the read-only scope Buddy requires and
+/// that it has not expired. It cannot verify that the token is an automation
+/// token or that TLS management is disabled: Fastly exposes those properties
+/// through `/automation-tokens/{id}`, which requires account-management
+/// permissions that the token's `User` role intentionally lacks. Checking them
+/// would require a separate, privileged credential.
 async fn assert_token_metadata(api_token: &str) -> anyhow::Result<()> {
     let client = Client::builder()
         .redirect(Policy::none())
@@ -83,39 +84,11 @@ async fn assert_token_metadata(api_token: &str) -> anyhow::Result<()> {
 
     let metadata: TokenMetadata = serde_json::from_str(&current_response.body)
         .context("Fastly returned invalid current token metadata")?;
-    validate_current_token(&metadata, SystemTime::now().into())?;
 
-    let automation_path = format!("/automation-tokens/{}", metadata.id);
-    let automation_response = api_request(&client, api_token, &automation_path).await?;
-    validate_automation_token(&metadata.id, &automation_response)
-}
-
-fn validate_automation_token(current_id: &str, response: &ApiResponse) -> anyhow::Result<()> {
-    if response.status == 404 {
-        bail!("Expected a Fastly automation token, but the current token is not one.");
-    }
-    require_success(
-        response,
-        "confirm that the current Fastly token is an automation token",
-    )?;
-
-    let automation_metadata: AutomationTokenMetadata = serde_json::from_str(&response.body)
-        .context("Fastly returned invalid automation token metadata")?;
-    if automation_metadata.id != current_id {
-        bail!("Fastly returned metadata for a different automation token.");
-    }
-    if automation_metadata.tls_access {
-        bail!("Expected the Fastly automation token not to have TLS management access.");
-    }
-
-    Ok(())
+    validate_current_token(&metadata, SystemTime::now().into())
 }
 
 fn validate_current_token(metadata: &TokenMetadata, now: DateTime<Utc>) -> anyhow::Result<()> {
-    if metadata.id.is_empty() || !metadata.id.bytes().all(|byte| byte.is_ascii_alphanumeric()) {
-        bail!("Fastly returned an invalid current token ID.");
-    }
-
     if metadata.scope != REQUIRED_SCOPE {
         bail!(
             "Expected the Fastly token to have exactly the {REQUIRED_SCOPE:?} scope, got {:?}.",
@@ -180,7 +153,6 @@ mod tests {
 
     fn metadata(scope: &str, expires_at: Option<&str>) -> TokenMetadata {
         TokenMetadata {
-            id: "FASTLYTOKENID".to_owned(),
             scope: scope.to_owned(),
             expires_at: expires_at.map(str::to_owned),
         }
@@ -240,85 +212,6 @@ mod tests {
         assert_eq!(
             error.to_string(),
             "Fastly returned an invalid token expiration date"
-        );
-    }
-
-    #[test]
-    fn rejects_invalid_token_id() {
-        let mut current = metadata(REQUIRED_SCOPE, Some("2026-07-29T00:00:00Z"));
-        current.id = "../another-token".to_owned();
-
-        assert_eq!(
-            validate_current_token(&current, now())
-                .unwrap_err()
-                .to_string(),
-            "Fastly returned an invalid current token ID."
-        );
-    }
-
-    #[test]
-    fn accepts_automation_token_metadata_regardless_of_services() {
-        for body in [
-            r#"{"id":"FASTLYTOKENID","tls_access":false}"#,
-            r#"{"id":"FASTLYTOKENID","tls_access":false,"services":[]}"#,
-            r#"{"id":"FASTLYTOKENID","tls_access":false,"services":["SERVICEID"]}"#,
-        ] {
-            validate_automation_token(
-                "FASTLYTOKENID",
-                &ApiResponse {
-                    status: 200,
-                    body: body.to_owned(),
-                },
-            )
-            .unwrap();
-        }
-    }
-
-    #[test]
-    fn rejects_automation_token_with_tls_access() {
-        assert_eq!(
-            validate_automation_token(
-                "FASTLYTOKENID",
-                &ApiResponse {
-                    status: 200,
-                    body: r#"{"id":"FASTLYTOKENID","tls_access":true}"#.to_owned(),
-                },
-            )
-            .unwrap_err()
-            .to_string(),
-            "Expected the Fastly automation token not to have TLS management access."
-        );
-    }
-
-    #[test]
-    fn rejects_token_missing_from_automation_api() {
-        assert_eq!(
-            validate_automation_token(
-                "FASTLYTOKENID",
-                &ApiResponse {
-                    status: 404,
-                    body: r#"{"msg":"Not found"}"#.to_owned(),
-                },
-            )
-            .unwrap_err()
-            .to_string(),
-            "Expected a Fastly automation token, but the current token is not one."
-        );
-    }
-
-    #[test]
-    fn rejects_different_automation_token_metadata() {
-        assert_eq!(
-            validate_automation_token(
-                "FASTLYTOKENID",
-                &ApiResponse {
-                    status: 200,
-                    body: r#"{"id":"ANOTHERTOKENID","tls_access":false}"#.to_owned(),
-                },
-            )
-            .unwrap_err()
-            .to_string(),
-            "Fastly returned metadata for a different automation token."
         );
     }
 }
