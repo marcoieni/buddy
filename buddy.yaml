@@ -30,7 +30,7 @@ disk: "100GiB"
 # Directories of the host exposed to the guest.
 mounts:
   - location: "~/buddy"
-    mountPoint: "/work"
+    mountPoint: "{{.Home}}/work"
     writable: true
 
 # Lima enables rootless containerd by default. This VM does not use containers,
