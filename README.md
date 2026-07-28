@@ -17,6 +17,7 @@ So place there all the projects you want to work on with codex.
 ## Set up
 
 ### Install host tools
+
 - Install the [Rust toolchain](https://rustup.rs/).
 
 - Install the required tools on the host. E.g. on MacOS:
