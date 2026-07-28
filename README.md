@@ -16,7 +16,7 @@ So place there all the projects you want to work on with codex.
 
 ## Set up
 
-### Install host tools
+### 1. Install host tools
 
 - Install the [Rust toolchain](https://rustup.rs/).
 
@@ -42,7 +42,7 @@ So place there all the projects you want to work on with codex.
   3. If you have the 1password desktop app installed, enable:
      **Settings > Developer > Integrate with 1password CLI**.
 
-### Set up the VM
+### 2. Set up the VM
 
 - Create the VM:
 
@@ -64,12 +64,14 @@ So place there all the projects you want to work on with codex.
   just login
   ```
 
-This is enough to run codex in the VM, but you can also connect from ChatGPT desktop
-and use codex remotely.
+### 3. Set up projects
 
-### Connect from ChatGPT desktop
+The host directory `~/buddy` is mounted inside the VM at `$HOME/work`.
+Place your projects in the host directory:
+`~/buddy/<project>` on the host will be available as `~/work/<project>` in the guest.
 
-- Install [ChatGPT desktop](https://chatgpt.com/download/)
+### 4. Set up SSH
+
 - Expose Lima's generated SSH configuration to OpenSSH:
   - Add this line to `~/.ssh/config`, outside any `Host` block (e.g. at the beginning of the file):
 
@@ -89,6 +91,12 @@ and use codex remotely.
 ssh lima-buddy
 ```
 
+See the [Lima SSH documentation](https://lima-vm.io/docs/usage/ssh/) for more details.
+
+### 5. Connect from ChatGPT desktop (optional)
+
+- Install [ChatGPT desktop](https://chatgpt.com/download/)
+
 - Configure the connection in ChatGPT desktop:
 
   1. Open **Settings > Connections > SSH**.
@@ -100,11 +108,7 @@ ssh lima-buddy
 
      ![ChatGPT desktop SSH connection settings](chatgpt-task.png)
 
-The host directory `~/buddy` is mounted inside the VM at `$HOME/work`, so
-`~/buddy/<project>` on macOS is available as `~/work/<project>` in ChatGPT.
-
-See the [Lima SSH documentation](https://lima-vm.io/docs/usage/ssh/) and the
-[ChatGPT remote connections documentation](https://learn.chatgpt.com/docs/remote-connections#connect-to-an-ssh-host)
+See the [ChatGPT remote connections documentation](https://learn.chatgpt.com/docs/remote-connections#connect-to-an-ssh-host)
 for more details.
 
 ## Useful commands
@@ -114,7 +118,7 @@ for more details.
 - Run commands in the VM:
 
   ```sh
-  limactl shell buddy uname -m
+  limactl shell buddy uname -a
   ```
 
 ## Security
@@ -153,7 +157,8 @@ It also has these disadvantages:
 
 > Why not running Codex directly on the host?
 
-- Auditing all commands that codex wants to run is not productive. Instead, by running in a VM without any privileges, you can run codex in yolo mode.
+Auditing all commands that codex wants to run is not productive. Instead, by
+running it in an isolated VM, you can run codex in yolo mode.
 
 > Why not using one VM per project?
 
@@ -172,5 +177,5 @@ Lima provides:
 
 > I don't want to run codex with full privileges, I think it is dangerous!
 
-Nobody forces you to run codex with full privileges. You can still run it in a VM for improved security
-_and_ customize its permissions.
+Nobody forces you to run codex with full privileges. You can still run it in the
+`buddy` VM for improved security _and_ customize its permissions.
