@@ -2,8 +2,11 @@
 set -Eeuo pipefail
 
 apt-get update
+
+# Codex uses bubblewrap for its Linux sandbox. This is needed if you want to run codex withot full access.
 apt-get install -y \
   build-essential \
+  bubblewrap \
   ca-certificates \
   curl \
   file \
