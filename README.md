@@ -125,6 +125,8 @@ for more details.
 - Keep credentials out of ordinary cloud configuration. For example, Fastly `global:read`
   correctly treats VCL as readable configuration, so a credential embedded in
   VCL is exposed even though protected secret fields remain unavailable.
+- Only use State of the Art (SOTA) models. Weak models can be tricked into
+  revealing secrets more easily.
 
 ### Passwordless sudo
 
