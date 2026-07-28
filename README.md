@@ -86,14 +86,7 @@ Place your projects in the host directory:
   ssh lima-buddy
   ```
 
-- (Optional) Launch the Codex TUI over SSH:
-
-  ```sh
-  ssh -t lima-buddy codex
-  ```
-
-  The `-t` option allocates the pseudo-terminal required by the interactive
-  interface.
+- (Optional) Launch the `codex` command inside the VM to start the Codex TUI:
 
 See the [Lima SSH documentation](https://lima-vm.io/docs/usage/ssh/) for more details.
 
