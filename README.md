@@ -157,7 +157,8 @@ It also has these disadvantages:
 
 > Why not running Codex directly on the host?
 
-- Auditing all commands that codex wants to run is not productive. Instead, by running in a VM without any privileges, you can run codex in yolo mode.
+- Auditing all commands that codex wants to run is not productive. Instead, by
+  running it in an isolated VM, you can run codex in yolo mode.
 
 > Why not using one VM per project?
 
