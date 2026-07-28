@@ -91,7 +91,7 @@ ssh lima-buddy
 - Configure the connection in ChatGPT desktop:
 
   1. Open **Settings > Connections > SSH**.
-  2. Select **Add**, then select or enable `lima-buddy`.
+  2. Select **Add**, then select `lima-buddy`.
   3. Choose `~/work` as the remote project folder, or `~/work/<project>` for a
      specific repository.
   4. Select `lima-buddy` as the run location when starting a task.
