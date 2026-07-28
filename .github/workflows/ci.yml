@@ -24,11 +24,17 @@ jobs:
       - name: Set up just
         uses: extractions/setup-just@v4.0.0
 
-      - name: Set up Lima
-        uses: lima-vm/lima-actions/setup@v1.1.0
-        with:
-          version: latest
-          ssh: false
+      - name: Install Lima CLI
+        env:
+          LIMA_VERSION: v2.2.0
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          archive="lima-${LIMA_VERSION#v}-Linux-x86_64.tar.gz"
+          gh release download "$LIMA_VERSION" \
+            --repo lima-vm/lima \
+            --pattern "$archive"
+          gh attestation verify "$archive" --owner lima-vm
+          sudo tar -C /usr/local -xzf "$archive"
 
       - name: Validate
         run: just validate
