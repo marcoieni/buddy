@@ -1,0 +1,7 @@
+interface:
+  display_name: "Rust Infrastructure"
+  short_description: "Observe and troubleshoot Rust infrastructure"
+  default_prompt: "Use $rust-infrastructure to investigate this Rust infrastructure issue using read-only evidence."
+
+policy:
+  allow_implicit_invocation: false
