@@ -1,18 +1,13 @@
 # buddy
 
+> [!NOTE]
+> This project is meant for people working on the Rust Project infrastructure.
+
 Run codex in a Linux VM using [lima](https://lima-vm.io/).
 Control it from [ChatGPT desktop](https://chatgpt.com/download/).
 
-The VM can have read-only access to Cloud services like DataDog and Fastly to debug issues.
-Don't provide read access to any secrets or credentials.
-
-Codex on the guest has only access to the `~/buddy` directory on the host.
-So place there all the projects you want to work on with codex.
-
-> [!NOTE]
-> This project is meant for people working on the Rust Project infrastructure.
-> It installs and configures tools `datadog`, and `fastly` that might not be
-> needed for other projects.
+The VM has read-only access to Cloud services like DataDog and Fastly.
+Credentials are read automatically from the Rust Foundation 1Password.
 
 ## Set up
 
