@@ -81,7 +81,8 @@ externally by Buddy rather than by a stored CLI profile.
 
 Before copying the token into the VM, Buddy inspects its metadata through the
 Fastly token APIs. Login fails unless the token is an automation token, has
-exactly the `global:read` scope, and has an expiration date in the future.
+exactly the `global:read` scope, applies to all services, has TLS management
+disabled, and has an expiration date in the future.
 
 ### Permissions
 

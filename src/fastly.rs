@@ -1,4 +1,4 @@
-use std::time::SystemTime;
+use std::time::{Duration, SystemTime};
 
 use anyhow::{Context, bail};
 use chrono::{DateTime, Utc};
@@ -17,6 +17,9 @@ use crate::{
 const SECRET_REFERENCE: &str = "op://Infrastructure/fastly-read-only/credential";
 const API_BASE_URL: &str = "https://api.fastly.com";
 const REQUIRED_SCOPE: &str = "global:read";
+const CONNECT_TIMEOUT: Duration = Duration::from_secs(5);
+const READ_TIMEOUT: Duration = Duration::from_secs(10);
+const REQUEST_TIMEOUT: Duration = Duration::from_secs(15);
 
 pub(crate) async fn login(vm: &str) -> anyhow::Result<()> {
     let api_token = read_secret(SECRET_REFERENCE)?;
@@ -53,8 +56,12 @@ struct TokenMetadata {
 #[derive(Debug, Deserialize)]
 struct AutomationTokenMetadata {
     id: String,
+    tls_access: bool,
+    #[serde(default)]
+    services: Vec<String>,
 }
 
+#[derive(Debug)]
 struct ApiResponse {
     status: u16,
     body: String,
@@ -63,6 +70,9 @@ struct ApiResponse {
 async fn assert_token_metadata(api_token: &str) -> anyhow::Result<()> {
     let client = Client::builder()
         .redirect(Policy::none())
+        .connect_timeout(CONNECT_TIMEOUT)
+        .read_timeout(READ_TIMEOUT)
+        .timeout(REQUEST_TIMEOUT)
         .build()
         .context("failed to create Fastly API client")?;
     let current_response = api_request(&client, api_token, "/tokens/self").await?;
@@ -93,6 +103,12 @@ fn validate_automation_token(current_id: &str, response: &ApiResponse) -> anyhow
         .context("Fastly returned invalid automation token metadata")?;
     if automation_metadata.id != current_id {
         bail!("Fastly returned metadata for a different automation token.");
+    }
+    if automation_metadata.tls_access {
+        bail!("Expected the Fastly automation token not to have TLS management access.");
+    }
+    if !automation_metadata.services.is_empty() {
+        bail!("Expected the Fastly automation token to have access to at least one service.");
     }
 
     Ok(())
@@ -244,15 +260,53 @@ mod tests {
     }
 
     #[test]
-    fn accepts_matching_automation_token_metadata() {
-        validate_automation_token(
-            "FASTLYTOKENID",
-            &ApiResponse {
-                status: 200,
-                body: r#"{"id":"FASTLYTOKENID"}"#.to_owned(),
-            },
-        )
-        .unwrap();
+    fn accepts_unrestricted_automation_token_metadata() {
+        for body in [
+            r#"{"id":"FASTLYTOKENID","tls_access":false}"#,
+            r#"{"id":"FASTLYTOKENID","tls_access":false,"services":[]}"#,
+        ] {
+            validate_automation_token(
+                "FASTLYTOKENID",
+                &ApiResponse {
+                    status: 200,
+                    body: body.to_owned(),
+                },
+            )
+            .unwrap();
+        }
+    }
+
+    #[test]
+    fn rejects_automation_token_with_tls_access() {
+        assert_eq!(
+            validate_automation_token(
+                "FASTLYTOKENID",
+                &ApiResponse {
+                    status: 200,
+                    body: r#"{"id":"FASTLYTOKENID","tls_access":true}"#.to_owned(),
+                },
+            )
+            .unwrap_err()
+            .to_string(),
+            "Expected the Fastly automation token not to have TLS management access."
+        );
+    }
+
+    #[test]
+    fn rejects_service_restricted_automation_token() {
+        assert_eq!(
+            validate_automation_token(
+                "FASTLYTOKENID",
+                &ApiResponse {
+                    status: 200,
+                    body: r#"{"id":"FASTLYTOKENID","tls_access":false,"services":["SERVICEID"]}"#
+                        .to_owned(),
+                },
+            )
+            .unwrap_err()
+            .to_string(),
+            "Expected the Fastly automation token to have access to all services."
+        );
     }
 
     #[test]
@@ -278,7 +332,7 @@ mod tests {
                 "FASTLYTOKENID",
                 &ApiResponse {
                     status: 200,
-                    body: r#"{"id":"ANOTHERTOKENID"}"#.to_owned(),
+                    body: r#"{"id":"ANOTHERTOKENID","tls_access":false}"#.to_owned(),
                 },
             )
             .unwrap_err()
