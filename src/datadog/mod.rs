@@ -36,8 +36,8 @@ pub(crate) fn login(vm: &str) -> anyhow::Result<()> {
         ],
     )?;
 
-    guest::capture(vm, "pup monitors list --limit 1 --read-only")?;
-    println!("Datadog authentication is configured and working.");
+    assert_permissions(vm)?;
+    println!("Datadog authentication is configured with the documented permissions.");
     Ok(())
 }
 
