@@ -51,6 +51,9 @@ So place there all the projects you want to work on with codex.
   you are experiencing issues, check the
   [authentication docs](./docs/authentication.md).
 
+- Enable "Device code authorization for Codex" in
+  [ChatGPT security settings](https://chatgpt.com/#settings/Security).
+
 - Login to Codex, Datadog and Fastly from the guest:
 
   ```sh
