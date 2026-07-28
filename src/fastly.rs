@@ -1,11 +1,8 @@
-use std::{
-    io::Write,
-    process::{Command, Stdio},
-    time::SystemTime,
-};
+use std::time::SystemTime;
 
 use anyhow::{Context, bail};
 use chrono::{DateTime, Utc};
+use reqwest::{blocking::Client, header::ACCEPT, redirect::Policy};
 use serde::Deserialize;
 
 use crate::{
@@ -60,7 +57,11 @@ struct ApiResponse {
 }
 
 fn assert_token_metadata(api_token: &str) -> anyhow::Result<()> {
-    let current_response = api_request(api_token, "/tokens/self")?;
+    let client = Client::builder()
+        .redirect(Policy::none())
+        .build()
+        .context("failed to create Fastly API client")?;
+    let current_response = api_request(&client, api_token, "/tokens/self")?;
     require_success(
         &current_response,
         "retrieve the current Fastly token metadata",
@@ -71,7 +72,7 @@ fn assert_token_metadata(api_token: &str) -> anyhow::Result<()> {
     validate_current_token(&metadata, SystemTime::now().into())?;
 
     let automation_path = format!("/automation-tokens/{}", metadata.id);
-    let automation_response = api_request(api_token, &automation_path)?;
+    let automation_response = api_request(&client, api_token, &automation_path)?;
     validate_automation_token(&metadata.id, &automation_response)
 }
 
@@ -119,49 +120,24 @@ fn validate_current_token(metadata: &TokenMetadata, now: DateTime<Utc>) -> anyho
     Ok(())
 }
 
-fn api_request(api_token: &str, path: &str) -> anyhow::Result<ApiResponse> {
+fn api_request(client: &Client, api_token: &str, path: &str) -> anyhow::Result<ApiResponse> {
     let url = format!("{API_BASE_URL}{path}");
-    let mut child = Command::new("curl")
-        .args([
-            "--silent",
-            "--show-error",
-            "--header",
-            "@-",
-            "--write-out",
-            "\n%{response_code}",
-            &url,
-        ])
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::inherit())
-        .spawn()
-        .context("failed to run curl")?;
+    let response = client
+        .get(url)
+        .header(ACCEPT, "application/json")
+        .header("Fastly-Key", api_token)
+        .send()
+        .context("failed to request the Fastly API")?;
+    let status = response.status().as_u16();
+    let body = String::from_utf8(
+        response
+            .bytes()
+            .context("failed to read the Fastly API response")?
+            .to_vec(),
+    )
+    .context("Fastly returned a non-UTF-8 response")?;
 
-    {
-        let mut stdin = child.stdin.take().context("failed to open curl stdin")?;
-        writeln!(stdin, "Accept: application/json").context("failed to send headers to curl")?;
-        writeln!(stdin, "Fastly-Key: {api_token}").context("failed to send headers to curl")?;
-    }
-
-    let output = child
-        .wait_with_output()
-        .context("failed to wait for curl")?;
-    if !output.status.success() {
-        bail!("curl exited with {}", output.status);
-    }
-
-    let output = String::from_utf8(output.stdout).context("curl returned non-UTF-8 output")?;
-    let (body, status) = output
-        .rsplit_once('\n')
-        .context("curl did not return a Fastly HTTP status")?;
-    let status = status
-        .parse()
-        .context("curl returned an invalid Fastly HTTP status")?;
-
-    Ok(ApiResponse {
-        status,
-        body: body.to_owned(),
-    })
+    Ok(ApiResponse { status, body })
 }
 
 fn require_success(response: &ApiResponse, action: &str) -> anyhow::Result<()> {
