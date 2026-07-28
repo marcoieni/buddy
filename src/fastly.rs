@@ -60,10 +60,14 @@ struct ApiResponse {
     body: String,
 }
 
-// Verify that the token ...
-// Fastly restricts automation-token metadata to credentials with account
-// management permissions, which the **User** role intentionally lacks.
-// ...
+/// Verifies the token metadata available from Fastly's `/tokens/self` endpoint.
+///
+/// This checks that the token has exactly the read-only scope Buddy requires and
+/// that it has not expired. It cannot verify that the token is an automation
+/// token or that TLS management is disabled: Fastly exposes those properties
+/// through `/automation-tokens/{id}`, which requires account-management
+/// permissions that the token's `User` role intentionally lacks. Checking them
+/// would require a separate, privileged credential.
 async fn assert_token_metadata(api_token: &str) -> anyhow::Result<()> {
     let client = Client::builder()
         .redirect(Policy::none())
@@ -81,8 +85,6 @@ async fn assert_token_metadata(api_token: &str) -> anyhow::Result<()> {
     let metadata: TokenMetadata = serde_json::from_str(&current_response.body)
         .context("Fastly returned invalid current token metadata")?;
 
-    // The User role cannot retrieve automation-token metadata. Token type and
-    // TLS access are checked against the documented settings when it is created.
     validate_current_token(&metadata, SystemTime::now().into())
 }
 
