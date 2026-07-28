@@ -16,7 +16,7 @@ So place there all the projects you want to work on with codex.
 
 ## Set up
 
-### Install host tools
+### 1. Install host tools
 
 - Install the [Rust toolchain](https://rustup.rs/).
 
@@ -42,7 +42,7 @@ So place there all the projects you want to work on with codex.
   3. If you have the 1password desktop app installed, enable:
      **Settings > Developer > Integrate with 1password CLI**.
 
-### Set up the VM
+### 2. Set up the VM
 
 - Create the VM:
 
@@ -67,9 +67,14 @@ So place there all the projects you want to work on with codex.
 This is enough to run codex in the VM, but you can also connect from ChatGPT desktop
 and use codex remotely.
 
-### Connect from ChatGPT desktop
+### 3. Set up projects
 
-- Install [ChatGPT desktop](https://chatgpt.com/download/)
+The host directory `~/buddy` is mounted inside the VM at `$HOME/work`.
+Place your projects in the host directory so that
+`~/buddy/<project>` on the host is available as `~/work/<project>` in the guest.
+
+### 4. Set up SSH
+
 - Expose Lima's generated SSH configuration to OpenSSH:
   - Add this line to `~/.ssh/config`, outside any `Host` block (e.g. at the beginning of the file):
 
@@ -89,6 +94,12 @@ and use codex remotely.
 ssh lima-buddy
 ```
 
+See the [Lima SSH documentation](https://lima-vm.io/docs/usage/ssh/) for more details.
+
+### 5. Connect from ChatGPT desktop
+
+- Install [ChatGPT desktop](https://chatgpt.com/download/)
+
 - Configure the connection in ChatGPT desktop:
 
   1. Open **Settings > Connections > SSH**.
@@ -100,11 +111,7 @@ ssh lima-buddy
 
      ![ChatGPT desktop SSH connection settings](chatgpt-task.png)
 
-The host directory `~/buddy` is mounted inside the VM at `$HOME/work`, so
-`~/buddy/<project>` on macOS is available as `~/work/<project>` in ChatGPT.
-
-See the [Lima SSH documentation](https://lima-vm.io/docs/usage/ssh/) and the
-[ChatGPT remote connections documentation](https://learn.chatgpt.com/docs/remote-connections#connect-to-an-ssh-host)
+See the [ChatGPT remote connections documentation](https://learn.chatgpt.com/docs/remote-connections#connect-to-an-ssh-host)
 for more details.
 
 ## Useful commands
