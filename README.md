@@ -144,29 +144,11 @@ It also has these disadvantages:
 - It offers no guest privilege boundary to contain accidental destructive
   system changes.
 
-Disabling passwordless sudo has the inverse tradeoffs: it adds a deliberate
-authentication step and limits an unprivileged compromise inside the guest, but
-root operations become interactive and unattended tasks that need `sudo` may
-block or fail. Lima generates an initial random password in `~/password`; rotate
-it after the first login. System provisioning scripts declared with
-`mode: system` still run as root.
-
-There is also a current Lima limitation: on non-macOS guests,
-`user.passwordlessSudo: false` requires `plain: true`. Plain mode disables the
-guest agent and filesystem mounts, including Buddy's `/work` mount. Therefore,
-disabling passwordless sudo is not currently a drop-in change for this
-template; it also requires a different way to move project files into the VM,
-such as SSH and `rsync`. The `user.passwordlessSudo` setting is experimental in
-Lima 2.2 and this limitation may change.
-
 ## FAQ
 
 > Why not running Codex directly on the host?
 
-- Auditing every command Codex wants to run is not productive. The VM limits
-  Codex to the guest and the resources explicitly exposed to it, so you can run
-  Codex in yolo mode. By default, Codex still has root access inside the guest
-  through [passwordless sudo](#passwordless-sudo).
+- Auditing all commands that codex wants to run is not productive. Instead, by running in a VM without any privileges, you can run codex in yolo mode.
 
 > Why not using one VM per project?
 
@@ -185,7 +167,5 @@ Lima provides:
 
 > I don't want to run codex with full privileges, I think it is dangerous!
 
-You can still use a VM for host isolation and customize Codex's permissions.
-See the [passwordless sudo tradeoffs](#passwordless-sudo) before removing guest
-root access: Lima's current opt-out is not compatible with Buddy's `/work`
-mount.
+Nobody forces you to run codex with full privileges. You can still run it in a VM for improved security
+_and_ customize its permissions.
