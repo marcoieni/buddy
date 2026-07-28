@@ -176,5 +176,5 @@ Lima provides:
 
 > I don't want to run codex with full privileges, I think it is dangerous!
 
-Nobody forces you to run codex with full privileges. You can still run it in a VM for improved security
-_and_ customize its permissions.
+Nobody forces you to run codex with full privileges. You can still run it in the
+`buddy` VM for improved security _and_ customize its permissions.
