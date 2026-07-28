@@ -118,7 +118,7 @@ for more details.
 - Run commands in the VM:
 
   ```sh
-  limactl shell buddy uname -m
+  limactl shell buddy uname -a
   ```
 
 ## Security
