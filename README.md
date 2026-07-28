@@ -96,7 +96,7 @@ ssh lima-buddy
 
 See the [Lima SSH documentation](https://lima-vm.io/docs/usage/ssh/) for more details.
 
-### 5. Connect from ChatGPT desktop
+### 5. Connect from ChatGPT desktop (optional)
 
 - Install [ChatGPT desktop](https://chatgpt.com/download/)
 
