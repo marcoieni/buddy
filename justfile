@@ -10,10 +10,10 @@ host:
     mkdir -p "{{ env('HOME') / 'buddy' }}"
 
 create: host
-    limactl start --name "{{ vm }}" buddy.yaml
+    limactl start --progress --name "{{ vm }}" buddy.yaml
 
 start:
-    limactl start "{{ vm }}"
+    limactl start --progress "{{ vm }}"
 
 # "-" tells just to ignore command failure
 stop:
