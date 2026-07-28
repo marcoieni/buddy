@@ -67,8 +67,8 @@ So place there all the projects you want to work on with codex.
 ### 3. Set up projects
 
 The host directory `~/buddy` is mounted inside the VM at `$HOME/work`.
-Place your projects in the host directory so that
-`~/buddy/<project>` on the host is available as `~/work/<project>` in the guest.
+Place your projects in the host directory:
+`~/buddy/<project>` on the host will be available as `~/work/<project>` in the guest.
 
 ### 4. Set up SSH
 
