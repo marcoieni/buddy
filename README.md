@@ -60,12 +60,6 @@ So place there all the projects you want to work on with codex.
   just login
   ```
 
-- Start the VM:
-
-  ```sh
-  just start
-  ```
-
 This is enough to run codex in the VM, but you can also connect from ChatGPT desktop
 and use codex remotely.
 
