@@ -42,10 +42,10 @@ enum DatadogPermissionsAction {
     },
 }
 
-pub(crate) fn run() -> anyhow::Result<()> {
+pub(crate) async fn run() -> anyhow::Result<()> {
     match Cli::parse().command {
         Commands::LoginDatadog { vm } => datadog::login(&vm),
-        Commands::LoginFastly { vm } => fastly::login(&vm),
+        Commands::LoginFastly { vm } => fastly::login(&vm).await,
         Commands::DatadogPermissions { action } => match action {
             DatadogPermissionsAction::Dump { vm } => datadog::dump_permissions(&vm),
             DatadogPermissionsAction::Assert { vm } => datadog::assert_permissions(&vm),

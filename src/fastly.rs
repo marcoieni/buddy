@@ -2,7 +2,7 @@ use std::time::SystemTime;
 
 use anyhow::{Context, bail};
 use chrono::{DateTime, Utc};
-use reqwest::{blocking::Client, header::ACCEPT, redirect::Policy};
+use reqwest::{Client, header::ACCEPT, redirect::Policy};
 use serde::Deserialize;
 
 use crate::{
@@ -14,7 +14,7 @@ const SECRET_REFERENCE: &str = "op://Infrastructure/fastly-read-only/credential"
 const API_BASE_URL: &str = "https://api.fastly.com";
 const REQUIRED_SCOPE: &str = "global:read";
 
-pub(crate) fn login(vm: &str) -> anyhow::Result<()> {
+pub(crate) async fn login(vm: &str) -> anyhow::Result<()> {
     let api_token = read_secret(SECRET_REFERENCE)?;
     if api_token.is_empty() {
         bail!("Expected a non-empty Fastly API token.");
@@ -23,7 +23,7 @@ pub(crate) fn login(vm: &str) -> anyhow::Result<()> {
         bail!("Expected the Fastly API token to contain no line breaks.");
     }
 
-    assert_token_metadata(&api_token)?;
+    assert_token_metadata(&api_token).await?;
 
     install_guest_env(
         vm,
@@ -56,12 +56,12 @@ struct ApiResponse {
     body: String,
 }
 
-fn assert_token_metadata(api_token: &str) -> anyhow::Result<()> {
+async fn assert_token_metadata(api_token: &str) -> anyhow::Result<()> {
     let client = Client::builder()
         .redirect(Policy::none())
         .build()
         .context("failed to create Fastly API client")?;
-    let current_response = api_request(&client, api_token, "/tokens/self")?;
+    let current_response = api_request(&client, api_token, "/tokens/self").await?;
     require_success(
         &current_response,
         "retrieve the current Fastly token metadata",
@@ -72,7 +72,7 @@ fn assert_token_metadata(api_token: &str) -> anyhow::Result<()> {
     validate_current_token(&metadata, SystemTime::now().into())?;
 
     let automation_path = format!("/automation-tokens/{}", metadata.id);
-    let automation_response = api_request(&client, api_token, &automation_path)?;
+    let automation_response = api_request(&client, api_token, &automation_path).await?;
     validate_automation_token(&metadata.id, &automation_response)
 }
 
@@ -120,18 +120,20 @@ fn validate_current_token(metadata: &TokenMetadata, now: DateTime<Utc>) -> anyho
     Ok(())
 }
 
-fn api_request(client: &Client, api_token: &str, path: &str) -> anyhow::Result<ApiResponse> {
+async fn api_request(client: &Client, api_token: &str, path: &str) -> anyhow::Result<ApiResponse> {
     let url = format!("{API_BASE_URL}{path}");
     let response = client
         .get(url)
         .header(ACCEPT, "application/json")
         .header("Fastly-Key", api_token)
         .send()
+        .await
         .context("failed to request the Fastly API")?;
     let status = response.status().as_u16();
     let body = String::from_utf8(
         response
             .bytes()
+            .await
             .context("failed to read the Fastly API response")?
             .to_vec(),
     )
