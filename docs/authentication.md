@@ -61,7 +61,7 @@ Create a new token from scratch only when the old one has expired:
 
 Buddy uses a [Fastly automation token](https://www.fastly.com/documentation/guides/account-info/user-and-account-management/using-api-tokens/). Unlike a user token, an automation token is
 not tied to an employee's account lifecycle. The token has the `global:read`
-scope on all services, and has an expiration date.
+scope and has an expiration date.
 
 The shared token is stored in the Rust Foundation 1Password `Infrastructure`
 vault as an item named `fastly-read-only`, in a field named `credential`.
@@ -78,6 +78,11 @@ This exports the token through the Fastly CLI's supported
 `FASTLY_API_TOKEN` environment variable. It also sets
 `FASTLY_DISABLE_AUTH_COMMAND=1` because Fastly authentication is managed
 externally by Buddy rather than by a stored CLI profile.
+
+Before copying the token into the VM, Buddy inspects its metadata through the
+Fastly token APIs. Login fails unless the token is an automation token, has
+exactly the `global:read` scope, has TLS management disabled, and has an
+expiration date in the future.
 
 ### Permissions
 

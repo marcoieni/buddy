@@ -4,6 +4,7 @@ mod datadog;
 mod fastly;
 mod guest;
 
-fn main() -> anyhow::Result<()> {
-    cli::run()
+#[tokio::main(flavor = "current_thread")]
+async fn main() -> anyhow::Result<()> {
+    cli::run().await
 }
