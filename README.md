@@ -16,6 +16,7 @@ So place there all the projects you want to work on with codex.
 
 ## Set up
 
+### Install host tools
 - Install the [Rust toolchain](https://rustup.rs/).
 
 - Install the required tools on the host. E.g. on MacOS:
@@ -39,6 +40,8 @@ So place there all the projects you want to work on with codex.
 
   3. If you have the 1password desktop app installed, enable:
      **Settings > Developer > Integrate with 1password CLI**.
+
+### Set up the VM
 
 - Create the VM:
 
@@ -66,7 +69,7 @@ and use codex remotely.
 ### Connect from ChatGPT desktop
 
 - Install [ChatGPT desktop](https://chatgpt.com/download/)
-- After creating the VM, expose Lima's generated SSH configuration to OpenSSH:
+- Expose Lima's generated SSH configuration to OpenSSH:
   - Add this line to `~/.ssh/config`, outside any `Host` block (e.g. at the beginning of the file):
 
     ```
