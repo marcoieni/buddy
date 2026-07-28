@@ -2,7 +2,11 @@ use std::time::SystemTime;
 
 use anyhow::{Context, bail};
 use chrono::{DateTime, Utc};
-use reqwest::{Client, header::ACCEPT, redirect::Policy};
+use reqwest::{
+    Client,
+    header::{ACCEPT, HeaderValue},
+    redirect::Policy,
+};
 use serde::Deserialize;
 
 use crate::{
@@ -122,6 +126,9 @@ fn validate_current_token(metadata: &TokenMetadata, now: DateTime<Utc>) -> anyho
 
 async fn api_request(client: &Client, api_token: &str, path: &str) -> anyhow::Result<ApiResponse> {
     let url = format!("{API_BASE_URL}{path}");
+    let mut api_token =
+        HeaderValue::from_str(api_token).context("Fastly API token is not a valid header value")?;
+    api_token.set_sensitive(true);
     let response = client
         .get(url)
         .header(ACCEPT, "application/json")
