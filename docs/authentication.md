@@ -79,6 +79,10 @@ This exports the token through the Fastly CLI's supported
 `FASTLY_DISABLE_AUTH_COMMAND=1` because Fastly authentication is managed
 externally by Buddy rather than by a stored CLI profile.
 
+Before copying the token into the VM, Buddy inspects its metadata through the
+Fastly token APIs. Login fails unless the token is an automation token, has
+exactly the `global:read` scope, and has an expiration date in the future.
+
 ### Permissions
 
 Fastly `global:read` can't read Fastly Secret Store values.
