@@ -57,8 +57,6 @@ struct TokenMetadata {
 struct AutomationTokenMetadata {
     id: String,
     tls_access: bool,
-    #[serde(default)]
-    services: Vec<String>,
 }
 
 #[derive(Debug)]
@@ -106,9 +104,6 @@ fn validate_automation_token(current_id: &str, response: &ApiResponse) -> anyhow
     }
     if automation_metadata.tls_access {
         bail!("Expected the Fastly automation token not to have TLS management access.");
-    }
-    if !automation_metadata.services.is_empty() {
-        bail!("Expected the Fastly automation token to have access to at least one service.");
     }
 
     Ok(())
@@ -260,10 +255,11 @@ mod tests {
     }
 
     #[test]
-    fn accepts_unrestricted_automation_token_metadata() {
+    fn accepts_automation_token_metadata_regardless_of_services() {
         for body in [
             r#"{"id":"FASTLYTOKENID","tls_access":false}"#,
             r#"{"id":"FASTLYTOKENID","tls_access":false,"services":[]}"#,
+            r#"{"id":"FASTLYTOKENID","tls_access":false,"services":["SERVICEID"]}"#,
         ] {
             validate_automation_token(
                 "FASTLYTOKENID",
@@ -289,23 +285,6 @@ mod tests {
             .unwrap_err()
             .to_string(),
             "Expected the Fastly automation token not to have TLS management access."
-        );
-    }
-
-    #[test]
-    fn rejects_service_restricted_automation_token() {
-        assert_eq!(
-            validate_automation_token(
-                "FASTLYTOKENID",
-                &ApiResponse {
-                    status: 200,
-                    body: r#"{"id":"FASTLYTOKENID","tls_access":false,"services":["SERVICEID"]}"#
-                        .to_owned(),
-                },
-            )
-            .unwrap_err()
-            .to_string(),
-            "Expected the Fastly automation token to have access to all services."
         );
     }
 
