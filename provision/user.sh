@@ -34,3 +34,6 @@ brew install fastly/tap/fastly
 
 # Install or update codex
 curl -fsSL https://chatgpt.com/codex/install.sh | sh
+
+# The Codex installer adds ~/.local/bin to .bashrc
+append_line_if_missing "export PATH=\"\$HOME/.local/bin:\$PATH\"" "$HOME/.profile"
