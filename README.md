@@ -91,12 +91,12 @@ ssh lima-buddy
 
   1. Open **Settings > Connections > SSH**.
   2. Select **Add**, then select or enable `lima-buddy`.
-  3. Choose `/work` as the remote project folder, or `/work/<project>` for a
+  3. Choose `~/work` as the remote project folder, or `~/work/<project>` for a
      specific repository.
   4. Select `lima-buddy` as the run location when starting a task.
 
-The host directory `~/buddy` is mounted inside the VM at `/work`, so
-`~/buddy/<project>` on macOS is available as `/work/<project>` in ChatGPT.
+The host directory `~/buddy` is mounted inside the VM at `$HOME/work`, so
+`~/buddy/<project>` on macOS is available as `~/work/<project>` in ChatGPT.
 
 See the [Lima SSH documentation](https://lima-vm.io/docs/usage/ssh/) and the
 [ChatGPT remote connections documentation](https://learn.chatgpt.com/docs/remote-connections#connect-to-an-ssh-host)
@@ -128,7 +128,7 @@ The template explicitly sets `user.passwordlessSudo: true`, which is
 [Lima's default for Linux guests](https://lima-vm.io/docs/config/sudo/).
 This gives Codex unrestricted root access inside the guest, but does not grant
 root access on the host. The VM boundary and the resources exposed to the VM,
-such as the writable `/work` mount, remain the main security boundary.
+such as the writable `$HOME/work` mount, remain the main security boundary.
 
 Enabling passwordless sudo has this advantage:
 
