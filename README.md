@@ -95,7 +95,10 @@ ssh lima-buddy
   2. Select **Add**, then select `lima-buddy`.
   3. Choose `~/work` as the remote project folder, or `~/work/<project>` for a
      specific repository.
-  4. Select `lima-buddy` as the run location when starting a task.
+  4. Select `lima-buddy` as the run location when starting a task, customizing
+     the permission, model, etc:
+
+     ![ChatGPT desktop SSH connection settings](chatgpt-task.png)
 
 The host directory `~/buddy` is mounted inside the VM at `$HOME/work`, so
 `~/buddy/<project>` on macOS is available as `~/work/<project>` in ChatGPT.
