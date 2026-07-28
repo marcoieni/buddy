@@ -122,11 +122,51 @@ for more details.
   correctly treats VCL as readable configuration, so a credential embedded in
   VCL is exposed even though protected secret fields remain unavailable.
 
+### Passwordless sudo
+
+The template explicitly sets `user.passwordlessSudo: true`, which is
+[Lima's default for Linux guests](https://lima-vm.io/docs/config/sudo/).
+This gives Codex unrestricted root access inside the guest, but does not grant
+root access on the host. The VM boundary and the resources exposed to the VM,
+such as the writable `/work` mount, remain the main security boundary.
+
+Enabling passwordless sudo has this advantage:
+
+- Codex and other automation can install packages, update the guest, and fix
+  system configuration without waiting for a password prompt.
+
+It also has these disadvantages:
+
+- Any process or untrusted project code running as the guest user can silently
+  become guest root.
+- A compromised process can change the guest operating system and access
+  credentials, files, and processes belonging to other users in the guest.
+- It offers no guest privilege boundary to contain accidental destructive
+  system changes.
+
+Disabling passwordless sudo has the inverse tradeoffs: it adds a deliberate
+authentication step and limits an unprivileged compromise inside the guest, but
+root operations become interactive and unattended tasks that need `sudo` may
+block or fail. Lima generates an initial random password in `~/password`; rotate
+it after the first login. System provisioning scripts declared with
+`mode: system` still run as root.
+
+There is also a current Lima limitation: on non-macOS guests,
+`user.passwordlessSudo: false` requires `plain: true`. Plain mode disables the
+guest agent and filesystem mounts, including Buddy's `/work` mount. Therefore,
+disabling passwordless sudo is not currently a drop-in change for this
+template; it also requires a different way to move project files into the VM,
+such as SSH and `rsync`. The `user.passwordlessSudo` setting is experimental in
+Lima 2.2 and this limitation may change.
+
 ## FAQ
 
 > Why not running Codex directly on the host?
 
-- Auditing all commands that codex wants to run is not productive. Instead, by running in a VM without any privileges, you can run codex in yolo mode.
+- Auditing every command Codex wants to run is not productive. The VM limits
+  Codex to the guest and the resources explicitly exposed to it, so you can run
+  Codex in yolo mode. By default, Codex still has root access inside the guest
+  through [passwordless sudo](#passwordless-sudo).
 
 > Why not using one VM per project?
 
@@ -145,5 +185,7 @@ Lima provides:
 
 > I don't want to run codex with full privileges, I think it is dangerous!
 
-Nobody forces you to run codex with full privileges. You can still run it in a VM for improved security
-_and_ customize its permissions.
+You can still use a VM for host isolation and customize Codex's permissions.
+See the [passwordless sudo tradeoffs](#passwordless-sudo) before removing guest
+root access: Lima's current opt-out is not compatible with Buddy's `/work`
+mount.
