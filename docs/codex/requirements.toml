@@ -1,0 +1,29 @@
+# Buddy keeps Codex offline by default and does not allow the unrestricted
+# full-access profile. Select buddy-observability only for tasks that need the
+# read-only Datadog or Fastly credentials installed in the guest.
+default_permissions = ":workspace"
+allowed_sandbox_modes = ["read-only", "workspace-write"]
+allowed_web_search_modes = ["cached"]
+
+[allowed_permission_profiles]
+":read-only" = true
+":workspace" = true
+buddy-observability = true
+
+[permissions.buddy-observability]
+description = "Workspace access with network access limited to Datadog and Fastly."
+extends = ":workspace"
+
+[permissions.buddy-observability.network]
+enabled = true
+
+[permissions.buddy-observability.network.domains]
+"**.datadoghq.com" = "allow"
+"api.fastly.com" = "allow"
+
+# Keep the administrator-owned allowlist exclusive even if a user adds network
+# rules in their own Codex configuration.
+[experimental_network]
+enabled = true
+allowed_domains = ["**.datadoghq.com", "api.fastly.com"]
+managed_allowed_domains_only = true
