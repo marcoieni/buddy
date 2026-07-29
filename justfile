@@ -19,6 +19,9 @@ start:
 stop:
     -limactl stop "{{ vm }}"
 
+# Reboots the guest OS without recreating the VM or deleting its disk data.
+restart: stop start
+
 delete: stop
     limactl delete --force "{{ vm }}"
 
