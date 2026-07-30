@@ -198,3 +198,15 @@ Lima provides:
 
 Nobody forces you to run codex with full privileges. You can still run it in the
 `buddy` VM for improved security _and_ customize its permissions.
+
+## License
+
+buddy is distributed under the terms of both the MIT license and the Apache
+License (Version 2.0).
+
+See [LICENSE-APACHE](LICENSE-APACHE) and [LICENSE-MIT](LICENSE-MIT) for details.
+
+## AI disclosure
+
+We used AI to generate parts of this project, reviewing its output and making
+modifications as needed.
