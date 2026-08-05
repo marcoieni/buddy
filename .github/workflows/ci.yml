@@ -16,13 +16,15 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Check formatting
         run: npx --yes prettier@3.9.6 --check .
 
       - name: Set up just
-        uses: extractions/setup-just@v4.0.0
+        uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
 
       - name: Install Lima CLI
         env:
@@ -38,3 +40,18 @@ jobs:
 
       - name: Validate
         run: just validate
+
+  zizmor:
+    name: zizmor
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Project checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check GHA Workflows for security issues
+        uses: zizmorcore/zizmor-action@6fc4b006235f201fdab3722e17240ab420d580e5 # v0.6.1
+        with:
+          advanced-security: false
