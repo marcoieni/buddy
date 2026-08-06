@@ -130,6 +130,26 @@ for more details.
 - Only use State of the Art (SOTA) models. Weak models can be tricked into
   revealing secrets more easily.
 
+### Internet access
+
+Buddy does not restrict Codex's internet access by default. An experimental,
+opt-in [`requirements.toml`](docs/codex/requirements.toml) is available for
+evaluation. It defines these profiles:
+
+- `:workspace` is the default profile. It can edit mounted projects but cannot
+  make network requests from commands.
+- `buddy-observability` adds command-line network access to Datadog and Fastly
+  only. Select it for tasks that need those services.
+- `:read-only` remains available, but `:danger-full-access` is not allowed.
+- Web search is limited to cached results rather than live browsing.
+
+There is no general-purpose "read-only internet" security boundary. Blocking
+HTTP write methods would not prevent data exfiltration: a secret can be placed
+in a URL, header, DNS query, or other nominally read-only request. The
+`buddy-observability` profile therefore restricts destinations rather than HTTP
+methods. Datadog and Fastly can still receive data sent to their allowed
+domains, so use the offline `:workspace` profile unless a task needs them.
+
 ### Passwordless sudo
 
 The template explicitly sets `user.passwordlessSudo: true`, which is
